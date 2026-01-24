@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Menu, GraduationCap } from 'lucide-react';
-import { searchPapers, findRelatedPapers } from './services/geminiService';
+import { searchPapers, findRelatedPapers } from './services/semanticScholarService.ts';
 import { Paper, Readlist, SearchState } from './types';
 import { PaperCard } from './components/PaperCard';
 import { ReadlistSidebar } from './components/ReadlistSidebar';

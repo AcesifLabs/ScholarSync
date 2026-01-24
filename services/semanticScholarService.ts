@@ -1,12 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
 import { Paper } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const SEMANTIC_SCHOLAR_API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
 
-const cleanJsonString = (str: string): string => {
-  return str.replace(/```json\n?|```/g, '').trim();
-};
+if (!SEMANTIC_SCHOLAR_API_KEY) {
+    console.warn("SEMANTIC_SCHOLAR_API_KEY is not defined in the environment.");
+} else {
+    console.log("SEMANTIC_SCHOLAR_API_KEY is detected.");
+}
 
 export const searchPapers = async (query: string, page: number = 1): Promise<{ papers: Paper[], rawText?: string }> => {
   try {
@@ -55,56 +55,42 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
 };
 
 export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
-  // Use Gemini to finding related papers to provide the "reason" context
   try {
-    const prompt = `
-      Find 6 high-quality academic research papers related to the following paper:
-      Title: "${paper.title}"
-      Authors: ${paper.authors.join(', ')}
-      Abstract: ${paper.abstract.substring(0, 300)}...
+    const limit = 6;
+    const response = await fetch(
+      `https://api.semanticscholar.org/recommendations/v1/papers/forpaper/${paper.id}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
+      {
+        headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
+      }
+    );
 
-      You must return a valid JSON array of objects. Do not include any conversational text outside the JSON.
-      Each object in the array must have these fields:
-      - title: string
-      - authors: array of strings
-      - abstract: string (short summary, max 2 sentences)
-      - year: string (publication year)
-      - source: string (e.g., "arXiv", "Nature", "IEEE")
-      - pdfUrl: string (direct link to the PDF or the landing page)
-      - isOpenAccess: boolean
-      - relatedReason: string (A brief, 1-sentence explanation of specifically why this paper is related to the original paper)
-      
-      Ensure the papers are real and valid citations if possible.
-    `;
+    if (!response.ok) {
+        if (response.status === 429) {
+            throw new Error("Too many requests to Semantic Scholar. Please wait a moment.");
+        }
+        throw new Error(`Semantic Scholar Recommendations Error: ${response.status} ${response.statusText}`);
+    }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        temperature: 0.3, 
-      },
-    });
-
-    const text = response.text || "";
-    const cleanedText = cleanJsonString(text);
-    const papers: any[] = JSON.parse(cleanedText);
+    const data = await response.json();
     
-    return papers.map((p, index) => ({
-      id: `gen-related-${Date.now()}-${index}`,
+    if (!data.recommendedPapers || !Array.isArray(data.recommendedPapers)) {
+        return [];
+    }
+
+    return data.recommendedPapers.map((p: any) => ({
+      id: p.paperId || `ss-rec-${Date.now()}-${Math.random()}`,
       title: p.title || "Unknown Title",
-      authors: Array.isArray(p.authors) ? p.authors : [p.authors || "Unknown"],
+      authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
       abstract: p.abstract || "No abstract available.",
       year: p.year?.toString() || "n.d.",
-      source: p.source || "AI Recommendation",
-      pdfUrl: p.pdfUrl || "",
-      isOpenAccess: !!p.isOpenAccess,
-      relatedReason: p.relatedReason
+      source: p.venue || "Semantic Scholar",
+      pdfUrl: p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
+      isOpenAccess: !!p.openAccessPdf,
+      relatedReason: `Recommended based on your interest in "${paper.title}"`
     }));
 
   } catch (error) {
-    console.error("Gemini Related Papers Error:", error);
-    // Return empty array instead of throwing to prevent app crash on related search failure
+    console.error("Semantic Scholar Recommendations Error:", error);
     return [];
   }
 };
