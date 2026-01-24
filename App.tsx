@@ -31,8 +31,8 @@ export default function App() {
   const [activeReadlistId, setActiveReadlistId] = useState<string | null>('default');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // Intersection Observer for Infinite Scroll
   const observerTarget = useRef<HTMLDivElement>(null);
+  const lastRequestTime = useRef<number>(0);
 
   // --- Effects ---
   useEffect(() => {
@@ -53,8 +53,16 @@ export default function App() {
     setSearchState(prev => ({ ...prev, isLoading: true }));
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const now = Date.now();
+        const timeSinceLastRequest = now - lastRequestTime.current;
+        const delay = Math.max(0, 1000 - timeSinceLastRequest);
+        
+        if (delay > 0) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
         const { papers } = await searchPapers(activeQuery, nextPage);
+        lastRequestTime.current = Date.now(); // Update time AFTER request completes
         if (papers.length === 0) {
             setHasMore(false);
             setSearchState(prev => ({ ...prev, isLoading: false }));
@@ -66,7 +74,9 @@ export default function App() {
             }));
         }
     } catch (err) {
-        setSearchState(prev => ({ ...prev, isLoading: false, error: "Failed to load more papers." }));
+        setSearchState(prev => ({ ...prev, isLoading: false }));
+        // Silent failure for infinite scroll to avoid disrupting UX
+        console.error("Failed to load more papers:", err);
     }
   }, [searchState.isLoading, hasMore, activeQuery, page]);
 
