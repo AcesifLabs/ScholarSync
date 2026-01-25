@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Paper } from '../types';
 import { BookOpen, Share2, Plus, Check, ExternalLink, Sparkles, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PaperDetailModal } from './PaperDetailModal';
 
 interface PaperCardProps {
   paper: Paper;
@@ -11,7 +12,7 @@ interface PaperCardProps {
 }
 
 export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, onFindRelated, isSaved }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   const handleReadPaper = () => {
@@ -39,7 +40,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
           <span className="text-xs text-slate-500 font-medium">{paper.year}</span>
         </div>
 
-        <h3 className="text-lg font-bold text-slate-800 leading-tight mb-2 hover:text-scholar-600 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <h3 className="text-lg font-bold text-slate-800 leading-tight mb-2 hover:text-scholar-600 cursor-pointer transition-colors" onClick={() => setShowModal(true)}>
           {paper.title}
         </h3>
 
@@ -57,16 +58,17 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
           </div>
         )}
 
-        <div className={`text-sm text-slate-600 mb-4 ${isExpanded ? '' : 'line-clamp-3'}`}>
+        <div className="text-sm text-slate-600 mb-4 line-clamp-3">
           {paper.abstract}
         </div>
 
-        {paper.abstract.length > 150 && (
+        {paper.abstract.length > 100 && (
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-xs text-scholar-600 font-medium mb-4 hover:underline self-start"
+            onClick={() => setShowModal(true)}
+            className="text-xs text-scholar-600 font-bold mb-4 hover:text-scholar-700 transition-colors self-start flex items-center gap-1"
           >
-            {isExpanded ? 'Show Less' : 'Read Abstract'}
+            Show Details
+            <ExternalLink size={12} />
           </button>
         )}
       </div>
@@ -104,6 +106,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
           <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save'}</span>
         </button>
       </div>
+
+      <PaperDetailModal
+        paper={paper}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onAddToReadlist={onAddToReadlist}
+        onFindRelated={onFindRelated}
+        onRead={handleReadPaper}
+        isSaved={isSaved}
+      />
     </div>
   );
 };

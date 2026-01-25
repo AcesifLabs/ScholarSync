@@ -34,10 +34,8 @@ export const useReadlists = () => {
     };
 
     const handleDeleteReadlist = (id: string) => {
-        if (confirm('Are you sure you want to delete this readlist?')) {
-            setReadlists(prev => prev.filter(l => l.id !== id));
-            if (activeReadlistId === id) setActiveReadlistId(null);
-        }
+        setReadlists(prev => prev.filter(l => l.id !== id));
+        if (activeReadlistId === id) setActiveReadlistId(null);
     };
 
     const handleAddToReadlist = (paper: Paper) => {
