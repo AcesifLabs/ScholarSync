@@ -8,6 +8,7 @@ export interface Paper {
   pdfUrl: string;
   isOpenAccess: boolean;
   relatedReason?: string;
+  openAccessPdf?: string;
 }
 
 export interface Readlist {

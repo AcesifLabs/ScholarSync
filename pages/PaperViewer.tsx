@@ -85,20 +85,11 @@ export default function PaperViewer() {
                         href={paper.pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
                         title="Open in new window"
                     >
                         <ExternalLink size={14} />
                         <span>External</span>
-                    </a>
-                    <a
-                        href={paper.pdfUrl}
-                        download
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-scholar-600 text-white hover:bg-scholar-700 rounded-md transition-colors shadow-sm"
-                        title="Download paper"
-                    >
-                        <Download size={14} />
-                        <span className="hidden sm:inline">Download</span>
                     </a>
                 </div>
             </header>
@@ -110,6 +101,7 @@ export default function PaperViewer() {
                         src={`${paper.pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
                         className="w-full h-full border-none"
                         title={paper.title}
+                        loading='eager'
                     />
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center p-8">
