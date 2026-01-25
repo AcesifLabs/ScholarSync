@@ -13,7 +13,7 @@ const cleanJsonString = (str: string): string => {
 
 const searchWithGemini = async (query: string): Promise<Paper[]> => {
   if (!client) throw new Error("GEMINI_API_KEY is not configured");
-  
+
   const prompt = `Find 12 real, high-quality academic research papers related to the topic: "${query}".
     You must return a valid JSON array of objects.
     Each object must have exactly these fields:
@@ -35,15 +35,15 @@ const searchWithGemini = async (query: string): Promise<Paper[]> => {
 
   const text = response.text || "";
   const papers = JSON.parse(cleanJsonString(text));
-  return papers.map((p: any) => ({ 
-    ...p, 
+  return papers.map((p: any) => ({
+    ...p,
     source: p.source ? `${p.source} (via Gemini)` : "Gemini AI"
   }));
 };
 
 const recommendWithGemini = async (paper: Paper): Promise<Paper[]> => {
   if (!client) throw new Error("GEMINI_API_KEY is not configured");
-  
+
   const prompt = `Recommend 6 academic research papers similar or highly relevant to this paper:
     Title: "${paper.title}"
     Authors: ${paper.authors.join(', ')}
@@ -71,12 +71,40 @@ const recommendWithGemini = async (paper: Paper): Promise<Paper[]> => {
   return papers;
 };
 
+const fetchWithRetry = async (url: string, options: RequestInit = {}, maxRetries: number = 5): Promise<Response> => {
+  let retries = 0;
+  while (retries < maxRetries) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+
+      // If it's a rate limit (429) or server error (5xx), retry
+      if (response.status === 429 || response.status >= 500) {
+        const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+        console.warn(`Retrying in ${Math.round(delay)}ms... (Attempt ${retries + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        retries++;
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      retries++;
+      if (retries >= maxRetries) throw error;
+      const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+      console.warn(`Fetch error, retrying in ${Math.round(delay)}ms... (Attempt ${retries}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error("Max retries reached");
+};
+
 export const searchPapers = async (query: string, page: number = 1): Promise<{ papers: Paper[], rawText?: string }> => {
   try {
     const limit = 12;
     const offset = (page - 1) * limit;
-    
-    const response = await fetch(
+
+    const response = await fetchWithRetry(
       `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
@@ -90,13 +118,14 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
     }
 
     if (!response.ok) {
-        throw new Error(`Semantic Scholar API Error: ${response.status} ${response.statusText}`);
+      // If not OK and was not retried (like 404 or something), we still might want fallback
+      throw new Error(`Semantic Scholar API Error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    
+
     if (!data.data || !Array.isArray(data.data)) {
-        return { papers: [] };
+      return { papers: [] };
     }
 
     const papers: Paper[] = data.data.map((p: any) => ({
@@ -116,18 +145,18 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
   } catch (error) {
     console.error("Search Error:", error);
     try {
-        console.warn("Attempting Gemini fallback after search error");
-        const papers = await searchWithGemini(query);
-        return { papers };
+      console.warn("Attempting Gemini fallback after search error");
+      const papers = await searchWithGemini(query);
+      return { papers };
     } catch (fallbackError) {
-        throw error;
+      throw error;
     }
   }
 };
 
 export const getPaperById = async (paperId: string): Promise<Paper> => {
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
@@ -135,7 +164,7 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
     );
 
     if (!response.ok) {
-        throw new Error(`Semantic Scholar Get Paper Error: ${response.status} ${response.statusText}`);
+      throw new Error(`Semantic Scholar Get Paper Error: ${response.status} ${response.statusText}`);
     }
 
     const p = await response.json();
@@ -160,7 +189,7 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
 export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
   try {
     const limit = 6;
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://api.semanticscholar.org/recommendations/v1/papers/forpaper/${paper.id}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
@@ -173,13 +202,13 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
     }
 
     if (!response.ok) {
-        throw new Error(`Semantic Scholar Recommendations Error: ${response.status} ${response.statusText}`);
+      throw new Error(`Semantic Scholar Recommendations Error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    
+
     if (!data.recommendedPapers || !Array.isArray(data.recommendedPapers)) {
-        return [];
+      return [];
     }
 
     return data.recommendedPapers.map((p: any) => ({
@@ -197,10 +226,10 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
   } catch (error) {
     console.error("Semantic Scholar Recommendations Error:", error);
     try {
-        console.warn("Attempting Gemini fallback after recommendation error");
-        return await recommendWithGemini(paper);
+      console.warn("Attempting Gemini fallback after recommendation error");
+      return await recommendWithGemini(paper);
     } catch (fallbackError) {
-        return [];
+      return [];
     }
   }
 };
