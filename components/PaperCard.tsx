@@ -15,7 +15,13 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
   const navigate = useNavigate();
 
   const handleReadPaper = () => {
-    if (paper.pdfUrl && paper.pdfUrl.toLowerCase().endsWith('.pdf')) {
+    const url = paper.pdfUrl.toLowerCase();
+    const isPotentialPdf = url.endsWith('.pdf') ||
+      url.includes('printable') ||
+      url.includes('download') ||
+      url.includes('article/file');
+
+    if (paper.pdfUrl && (isPotentialPdf || paper.isOpenAccess)) {
       navigate(`/paper/${paper.id}`);
     } else {
       window.open(paper.pdfUrl, '_blank');

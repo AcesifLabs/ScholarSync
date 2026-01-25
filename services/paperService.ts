@@ -105,7 +105,7 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
     const offset = (page - 1) * limit;
 
     const response = await fetchWithRetry(
-      `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
+      `/api/ss/graph/v1/paper/search?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
       }
@@ -157,7 +157,7 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
 export const getPaperById = async (paperId: string): Promise<Paper> => {
   try {
     const response = await fetchWithRetry(
-      `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
+      `/api/ss/graph/v1/paper/${paperId}?fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
       }
@@ -190,7 +190,7 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
   try {
     const limit = 6;
     const response = await fetchWithRetry(
-      `https://api.semanticscholar.org/recommendations/v1/papers/forpaper/${paper.id}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
+      `/api/ss/recommendations/v1/papers/forpaper/${paper.id}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
       {
         headers: SEMANTIC_SCHOLAR_API_KEY ? { 'x-api-key': SEMANTIC_SCHOLAR_API_KEY } : {}
       }
