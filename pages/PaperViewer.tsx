@@ -4,6 +4,7 @@ import { Loader2, BookOpen } from 'lucide-react';
 import { usePdfViewer } from '../hooks/usePdfViewer';
 import { ViewerHeader } from '../components/viewer/ViewerHeader';
 import { PdfDisplay } from '../components/viewer/PdfDisplay';
+import { PaperDetailSkeleton } from '../components/Skeleton';
 
 export default function PaperViewer() {
     const { id } = useParams<{ id: string }>();
@@ -19,9 +20,17 @@ export default function PaperViewer() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
-                <Loader2 className="h-10 w-10 text-scholar-600 animate-spin mb-4" />
-                <p className="text-slate-500 font-medium">Loading paper...</p>
+            <div className="min-h-screen bg-slate-50">
+                <div className="bg-white border-b border-slate-200 py-4">
+                    <div className="max-w-7xl mx-auto px-4 flex items-center">
+                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                            <Loader2 className="h-5 w-5 text-slate-400 animate-spin" />
+                        </button>
+                    </div>
+                </div>
+                <div className="py-12">
+                    <PaperDetailSkeleton />
+                </div>
             </div>
         );
     }

@@ -5,15 +5,14 @@ import { useSearch } from '../hooks/useSearch';
 import { useReadlists } from '../hooks/useReadlists';
 
 import { PaperCard } from '../components/PaperCard';
-import { Spinner } from '../components/Spinner';
+import { PaperCardSkeleton } from '../components/Skeleton';
 import { SearchBar } from '../components/SearchBar';
-import { SearchingState } from '../components/SearchingState';
 import { ReadlistDetail } from '../components/ReadlistDetail';
 import { MainLayout } from '../components/MainLayout';
 
 export default function Home() {
     const navigate = useNavigate();
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
     const observerTarget = useRef<HTMLDivElement>(null);
     const mainScrollRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +128,13 @@ export default function Home() {
                 </div>
 
                 <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-                    {isInitialLoading && <SearchingState />}
+                    {isInitialLoading && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {[...Array(6)].map((_, i) => (
+                                <PaperCardSkeleton key={i} />
+                            ))}
+                        </div>
+                    )}
 
                     {searchState.error && (
                         <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 text-center mb-6">
@@ -156,10 +161,16 @@ export default function Home() {
                                 ))}
                             </div>
 
-                            <div ref={observerTarget} className="py-8 flex justify-center">
-                                {searchState.isLoading && <Spinner />}
+                            <div ref={observerTarget} className="py-8">
+                                {searchState.isLoading && (
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {[...Array(3)].map((_, i) => (
+                                            <PaperCardSkeleton key={i} />
+                                        ))}
+                                    </div>
+                                )}
                                 {!searchState.isLoading && !hasMore && hasResults && (
-                                    <p className="text-slate-400 text-sm">No more related papers found.</p>
+                                    <p className="text-slate-400 text-sm text-center">No more related papers found.</p>
                                 )}
                             </div>
                         </div>

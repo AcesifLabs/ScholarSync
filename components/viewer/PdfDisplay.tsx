@@ -1,5 +1,6 @@
 import React from 'react';
-import { Loader2, BookOpen, ExternalLink } from 'lucide-react';
+import { BookOpen, ExternalLink } from 'lucide-react';
+import { Skeleton } from '../Skeleton';
 
 interface PdfDisplayProps {
     isPdf: boolean | null;
@@ -16,11 +17,15 @@ export const PdfDisplay: React.FC<PdfDisplayProps> = ({
 }) => {
     if (verifyingPdf) {
         return (
-            <div className="flex flex-col items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 text-scholar-600 animate-spin mb-2" />
-                <p className="text-slate-500 text-sm">
-                    Verifying document type...
-                </p>
+            <div className="flex flex-col items-center justify-center h-full space-y-4 p-8">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-4 w-48" />
+                <div className="w-full max-w-2xl h-[60vh] bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                </div>
             </div>
         );
     }

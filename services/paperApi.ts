@@ -1,7 +1,7 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {GoogleGenAI} from "@google/genai";
-import {Paper} from "../types";
-import {cleanJsonString, extractArxivPdfUrl, fetchWithRetry} from "../lib/paperServiceUtils";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { GoogleGenAI } from "@google/genai";
+import { Paper } from "../types";
+import { cleanJsonString, extractArxivPdfUrl, fetchWithRetry } from "../lib/paperServiceUtils";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const SEMANTIC_SCHOLAR_API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
@@ -131,6 +131,18 @@ export const paperApi = createApi({
                     }
                 }
             },
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    data.papers.forEach(paper => {
+                        dispatch(
+                            paperApi.util.upsertQueryData('getPaperById', paper.id, paper)
+                        );
+                    });
+                } catch {
+                    // ignore
+                }
+            },
         }),
         getPaperById: builder.query<Paper, string>({
             queryFn: async (paperId) => {
@@ -207,7 +219,7 @@ export const paperApi = createApi({
                         return {
                             id: p.paperId || `ss-rec-${Date.now()}-${Math.random()}`,
                             title: p.title || "Unknown Title",
-                            authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
+                            authors: Array.isArray(p.authors) ? p.authors.map((a) => a.name) : [],
                             abstract: p.abstract || "No abstract available.",
                             year: p.year?.toString() || "n.d.",
                             source: p.venue || "Semantic Scholar",
@@ -228,6 +240,18 @@ export const paperApi = createApi({
                     } catch {
                         return { data: [] };
                     }
+                }
+            },
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data: papers } = await queryFulfilled;
+                    papers.forEach(paper => {
+                        dispatch(
+                            paperApi.util.upsertQueryData('getPaperById', paper.id, paper)
+                        );
+                    });
+                } catch {
+                    // ignore
                 }
             },
         }),
