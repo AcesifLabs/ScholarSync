@@ -54,7 +54,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     <header className="bg-white border-b border-slate-200 p-4 flex items-center justify-between md:hidden z-30 shrink-0">
                         <div className="flex items-center gap-2">
                             <GraduationCap className="text-scholar-600" />
-                            <span className="font-bold text-slate-800">ScholarStream</span>
+                            <span className="font-bold text-slate-800">ScholarSync</span>
                         </div>
                         <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-md">
                             <Menu size={24} />

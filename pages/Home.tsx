@@ -97,7 +97,7 @@ export default function Home() {
                 <div className="flex-1 flex flex-col items-center justify-center py-10 md:py-20 text-center space-y-6 max-w-7xl mx-auto px-4 w-full">
                     <div className="flex items-center gap-2 mb-4">
                         <GraduationCap size={56} className="text-scholar-600" />
-                        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">ScholarStream</h1>
+                        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">ScholarSync</h1>
                     </div>
                     <SearchBar
                         query={searchState.query}
@@ -202,6 +202,6 @@ export default function Home() {
 const ProjectLogo = () => (
     <>
         <GraduationCap className="text-scholar-600" size={24} />
-        <span className="font-bold text-slate-800">ScholarStream</span>
+        <span className="font-bold text-slate-800">ScholarSync</span>
     </>
 );

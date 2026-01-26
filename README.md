@@ -1,6 +1,6 @@
-# ScholarStream
+# ScholarSync
 
-ScholarStream is an advanced research paper discovery and management tool designed to streamline the academic literature review process. Powered by the **Semantic Scholar Graph API** and **Google's Gemini 2.0 Flash**, it offers a seamless blend of traditional search and AI-driven discovery.
+ScholarSync is an advanced research paper discovery and management tool designed to streamline the academic literature review process. Powered by the **Semantic Scholar Graph API** and **Google's Gemini 2.0 Flash**, it offers a seamless blend of traditional search and AI-driven discovery.
 
 ## 🚀 Key Features
 

@@ -11,6 +11,21 @@ const cleanJsonString = (str: string): string => {
   return str.replace(/```json\n?|```/g, '').trim();
 };
 
+// Extract arXiv PDF URL from disclaimer text
+const extractArxivPdfUrl = (disclaimer?: string): string | null => {
+  if (!disclaimer) return null;
+
+  // Match arXiv URLs in the disclaimer (e.g., https://arxiv.org/abs/2505.20279)
+  // Stop matching before common punctuation (comma, period, semicolon, etc.)
+  const arxivMatch = disclaimer.match(/https:\/\/arxiv\.org\/abs\/([^\s,;]+)/);
+  if (arxivMatch) {
+    // Convert from /abs/ to /pdf/
+    return `https://arxiv.org/pdf/${arxivMatch[1]}`;
+  }
+
+  return null;
+};
+
 const searchWithGemini = async (query: string): Promise<Paper[]> => {
   if (!client) throw new Error("GEMINI_API_KEY is not configured");
 
@@ -128,17 +143,24 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
       return { papers: [] };
     }
 
-    const papers: Paper[] = data.data.map((p: any) => ({
-      id: p.paperId || `ss-${Date.now()}-${Math.random()}`,
-      title: p.title || "Unknown Title",
-      authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
-      abstract: p.abstract || "No abstract available.",
-      year: p.year?.toString() || "n.d.",
-      source: p.venue || "Semantic Scholar",
-      pdfUrl: p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
-      isOpenAccess: !!p.openAccessPdf,
-      relatedReason: undefined
-    }));
+    const papers: Paper[] = data.data.map((p: any) => {
+      // Try to extract arXiv PDF URL from disclaimer if not open access
+      const arxivPdfUrl = !p.openAccessPdf?.url && p.openAccessPdf?.disclaimer
+        ? extractArxivPdfUrl(p.openAccessPdf.disclaimer)
+        : null;
+
+      return {
+        id: p.paperId || `ss-${Date.now()}-${Math.random()}`,
+        title: p.title || "Unknown Title",
+        authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
+        abstract: p.abstract || "No abstract available.",
+        year: p.year?.toString() || "n.d.",
+        source: p.venue || "Semantic Scholar",
+        pdfUrl: arxivPdfUrl || p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
+        isOpenAccess: !!p.openAccessPdf,
+        relatedReason: undefined
+      };
+    });
 
     return { papers };
 
@@ -168,6 +190,12 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
     }
 
     const p = await response.json();
+
+    // Try to extract arXiv PDF URL from disclaimer if not open access
+    const arxivPdfUrl = !p.openAccessPdf?.url && p.openAccessPdf?.disclaimer
+      ? extractArxivPdfUrl(p.openAccessPdf.disclaimer)
+      : null;
+
     return {
       id: p.paperId,
       title: p.title || "Unknown Title",
@@ -175,7 +203,7 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
       abstract: p.abstract || "No abstract available.",
       year: p.year?.toString() || "n.d.",
       source: p.venue || "Semantic Scholar",
-      pdfUrl: p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
+      pdfUrl: arxivPdfUrl || p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
       isOpenAccess: !!p.openAccessPdf,
       relatedReason: undefined
     };
@@ -211,17 +239,24 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
       return [];
     }
 
-    return data.recommendedPapers.map((p: any) => ({
-      id: p.paperId || `ss-rec-${Date.now()}-${Math.random()}`,
-      title: p.title || "Unknown Title",
-      authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
-      abstract: p.abstract || "No abstract available.",
-      year: p.year?.toString() || "n.d.",
-      source: p.venue || "Semantic Scholar",
-      pdfUrl: p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
-      isOpenAccess: !!p.openAccessPdf,
-      relatedReason: `Recommended based on your interest in "${paper.title}"`
-    }));
+    return data.recommendedPapers.map((p: any) => {
+      // Try to extract arXiv PDF URL from disclaimer if not open access
+      const arxivPdfUrl = !p.openAccessPdf?.url && p.openAccessPdf?.disclaimer
+        ? extractArxivPdfUrl(p.openAccessPdf.disclaimer)
+        : null;
+
+      return {
+        id: p.paperId || `ss-rec-${Date.now()}-${Math.random()}`,
+        title: p.title || "Unknown Title",
+        authors: Array.isArray(p.authors) ? p.authors.map((a: any) => a.name) : [],
+        abstract: p.abstract || "No abstract available.",
+        year: p.year?.toString() || "n.d.",
+        source: p.venue || "Semantic Scholar",
+        pdfUrl: arxivPdfUrl || p.openAccessPdf?.url || p.url || `https://www.semanticscholar.org/paper/${p.paperId}`,
+        isOpenAccess: !!p.openAccessPdf,
+        relatedReason: `Recommended based on your interest in "${paper.title}"`
+      };
+    });
 
   } catch (error) {
     console.error("Semantic Scholar Recommendations Error:", error);
