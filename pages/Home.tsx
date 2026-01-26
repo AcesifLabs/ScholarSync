@@ -4,7 +4,6 @@ import { GraduationCap } from 'lucide-react';
 import { useSearch } from '../hooks/useSearch';
 import { useReadlists } from '../hooks/useReadlists';
 
-// Components
 import { PaperCard } from '../components/PaperCard';
 import { Spinner } from '../components/Spinner';
 import { SearchBar } from '../components/SearchBar';

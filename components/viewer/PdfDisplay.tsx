@@ -3,38 +3,32 @@ import { Loader2, BookOpen, ExternalLink } from 'lucide-react';
 
 interface PdfDisplayProps {
     isPdf: boolean | null;
-    isBlockedDomain: boolean;
-    blobUrl: string | null;
     pdfUrl: string;
     title: string;
     verifyingPdf: boolean;
-    downloading: boolean;
 }
 
 export const PdfDisplay: React.FC<PdfDisplayProps> = ({
     isPdf,
-    isBlockedDomain,
-    blobUrl,
     pdfUrl,
     title,
-    verifyingPdf,
-    downloading
+    verifyingPdf
 }) => {
-    if (verifyingPdf || downloading) {
+    if (verifyingPdf) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
                 <Loader2 className="h-8 w-8 text-scholar-600 animate-spin mb-2" />
                 <p className="text-slate-500 text-sm">
-                    {downloading ? "Preparing secure document viewer..." : "Verifying document type..."}
+                    Verifying document type...
                 </p>
             </div>
         );
     }
 
-    if (isPdf && (blobUrl || !isBlockedDomain)) {
+    if (isPdf) {
         return (
             <iframe
-                src={`${blobUrl || pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+                src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`}
                 className="w-full h-full border-none"
                 title={title}
                 loading='eager'
@@ -47,13 +41,10 @@ export const PdfDisplay: React.FC<PdfDisplayProps> = ({
             <div className="bg-white p-10 rounded-2xl shadow-lg border border-slate-200 max-w-lg w-full">
                 <BookOpen size={48} className="text-scholar-200 mx-auto mb-6" />
                 <h2 className="text-2xl font-bold text-slate-800 mb-4">
-                    {isBlockedDomain ? "Security Restriction" : "Cannot Embed This Link"}
+                    Cannot Embed This Link
                 </h2>
                 <p className="text-slate-600 mb-8 leading-relaxed text-lg">
-                    {isBlockedDomain
-                        ? "This journal (PLOS) does not allow their papers to be viewed inside other apps for security reasons. You can still read it on their official site."
-                        : "This paper link doesn't seem to be embeddable. You can still read it on the publisher's website."
-                    }
+                    This paper link doesn't seem to be embeddable. You can still read it on the publisher's website.
                 </p>
                 <a
                     href={pdfUrl}

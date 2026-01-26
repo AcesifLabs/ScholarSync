@@ -14,10 +14,7 @@ export default function PaperViewer() {
         loading,
         error,
         isPdf,
-        verifyingPdf,
-        isBlockedDomain,
-        blobUrl,
-        downloading
+        verifyingPdf
     } = usePdfViewer(id);
 
     if (loading) {
@@ -62,12 +59,9 @@ export default function PaperViewer() {
             <main className="flex-1 relative overflow-hidden bg-slate-100">
                 <PdfDisplay
                     isPdf={isPdf}
-                    isBlockedDomain={isBlockedDomain}
-                    blobUrl={blobUrl}
                     pdfUrl={paper.pdfUrl}
                     title={paper.title}
                     verifyingPdf={verifyingPdf}
-                    downloading={downloading}
                 />
             </main>
         </div>

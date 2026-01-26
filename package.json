@@ -18,12 +18,14 @@
   },
   "dependencies": {
     "@google/genai": "^1.38.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "@xyflow/react": "^12.10.0",
     "lucide-react": "^0.563.0",
     "pdfjs-dist": "^4.10.38",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-pdf-highlighter": "8.0.0-rc.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {

@@ -8,11 +8,16 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <Provider store={store}>
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  </Provider>
 );

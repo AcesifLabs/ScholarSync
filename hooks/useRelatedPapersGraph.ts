@@ -5,7 +5,7 @@ import {
     MarkerType,
     Edge
 } from '@xyflow/react';
-import { getPaperById, findRelatedPapers } from '../services/paperService';
+import { useLazyGetPaperByIdQuery, useLazyGetRelatedPapersQuery } from '../services/paperApi';
 import { Paper } from '../types';
 import { PaperNodeType } from '../components/PaperNode';
 
@@ -17,11 +17,14 @@ export const useRelatedPapersGraph = (
     const [nodes, setNodes, onNodesChange] = useNodesState<PaperNodeType>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
+    const [triggerGetPaper] = useLazyGetPaperByIdQuery();
+    const [triggerGetRelated] = useLazyGetRelatedPapersQuery();
+
     const onFindRelatedRef = useRef<(paper: Paper) => Promise<void>>(async () => { });
 
     const onFindRelated = useCallback(async (paper: Paper) => {
         try {
-            const related = await findRelatedPapers(paper);
+            const related = await triggerGetRelated(paper).unwrap();
 
             setNodes(nds => {
                 const currentNode = nds.find(n => n.id === paper.id);
@@ -74,7 +77,7 @@ export const useRelatedPapersGraph = (
         } catch (err) {
             console.error("Failed to expand graph:", err);
         }
-    }, [setNodes, setEdges, savedPapers, handleAddToReadlist]);
+    }, [setNodes, setEdges, savedPapers, handleAddToReadlist, triggerGetRelated]);
 
     useEffect(() => {
         onFindRelatedRef.current = onFindRelated;
@@ -85,7 +88,7 @@ export const useRelatedPapersGraph = (
 
         const initGraph = async () => {
             try {
-                const rootPaper = await getPaperById(paperId);
+                const rootPaper = await triggerGetPaper(paperId).unwrap();
 
                 const initialNode: PaperNodeType = {
                     id: rootPaper.id,
@@ -99,7 +102,7 @@ export const useRelatedPapersGraph = (
                     position: { x: 0, y: 0 },
                 };
 
-                const related = await findRelatedPapers(rootPaper);
+                const related = await triggerGetRelated(rootPaper).unwrap();
                 const firstLevelNodes: PaperNodeType[] = related.map((p, index) => {
                     const angle = (index / related.length) * 2 * Math.PI;
                     const radius = 500;
@@ -132,7 +135,7 @@ export const useRelatedPapersGraph = (
         };
 
         initGraph();
-    }, [paperId, onFindRelated, handleAddToReadlist, savedPapers, setNodes, setEdges]);
+    }, [paperId, onFindRelated, handleAddToReadlist, savedPapers, setNodes, setEdges, triggerGetPaper, triggerGetRelated]);
 
     return {
         nodes,

@@ -14,11 +14,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/ss/, ''),
         },
-        '/api/pdf-proxy/plos': {
-          target: 'https://journals.plos.org',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/pdf-proxy\/plos/, ''),
-        },
+
       },
     },
     plugins: [react()],

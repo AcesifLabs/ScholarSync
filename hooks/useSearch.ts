@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { searchPapers } from '../services/paperService';
-import { Paper, SearchState } from '../types';
+import { useLazySearchPapersQuery } from '../services/paperApi';
+import { SearchState } from '../types';
 
 export const useSearch = () => {
+    const [trigger] = useLazySearchPapersQuery();
+
     const [searchState, setSearchState] = useState<SearchState>(() => {
         const saved = localStorage.getItem('scholar_search_state');
         return saved ? JSON.parse(saved) : {
@@ -29,7 +31,6 @@ export const useSearch = () => {
 
     const lastRequestTime = useRef<number>(0);
 
-    // Persistence
     useEffect(() => {
         localStorage.setItem('scholar_search_state', JSON.stringify({ ...searchState, isLoading: false }));
     }, [searchState]);
@@ -56,7 +57,8 @@ export const useSearch = () => {
         setSearchState(prev => ({ ...prev, query: queryToUse, isLoading: true, error: null, results: [] }));
 
         try {
-            const { papers } = await searchPapers(queryToUse, 1);
+            const { papers } = await trigger({ query: queryToUse, page: 1 }).unwrap();
+
             if (papers.length === 0) {
                 setSearchState(prev => ({ ...prev, isLoading: false, results: [], error: activeQuery ? null : "No papers found." }));
             } else {
@@ -66,7 +68,7 @@ export const useSearch = () => {
             console.error("Search failed:", err);
             setSearchState(prev => ({ ...prev, isLoading: false, error: "Failed to fetch papers." }));
         }
-    }, [activeQuery]);
+    }, [trigger, activeQuery]);
 
     const handleLoadMore = useCallback(async () => {
         if (searchState.isLoading || !hasMore || !activeQuery) return;
@@ -84,7 +86,7 @@ export const useSearch = () => {
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
 
-            const { papers } = await searchPapers(activeQuery, nextPage);
+            const { papers } = await trigger({ query: activeQuery, page: nextPage }).unwrap();
             lastRequestTime.current = Date.now();
 
             if (papers.length === 0) {
@@ -101,7 +103,7 @@ export const useSearch = () => {
             setSearchState(prev => ({ ...prev, isLoading: false }));
             console.error("Failed to load more papers:", err);
         }
-    }, [searchState.isLoading, hasMore, activeQuery, page]);
+    }, [searchState.isLoading, hasMore, activeQuery, page, trigger]);
 
     return {
         searchState,
