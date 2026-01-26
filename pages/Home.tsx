@@ -42,7 +42,6 @@ export default function Home() {
     const hasResults = searchState.results.length > 0;
     const isInitialLoading = searchState.isLoading && searchState.results.length === 0;
 
-    // Infinite Scroll Observer
     useEffect(() => {
         const observer = new IntersectionObserver(
             entries => {
@@ -60,13 +59,12 @@ export default function Home() {
         return () => observer.disconnect();
     }, [handleLoadMore]);
 
-    // Scroll Restoration Logic
     useEffect(() => {
         const container = mainScrollRef.current;
         if (!container) return;
 
         const handleScroll = () => {
-            if (!activeReadlistId) { // Only save scroll for search results
+            if (!activeReadlistId) {
                 sessionStorage.setItem('scholar_scroll_pos', container.scrollTop.toString());
             }
         };
@@ -75,12 +73,10 @@ export default function Home() {
         return () => container.removeEventListener('scroll', handleScroll);
     }, [activeReadlistId]);
 
-    // Apply restoration when results appear
     useEffect(() => {
         if (hasResults && !isInitialLoading && !activeReadlistId) {
             const savedPos = sessionStorage.getItem('scholar_scroll_pos');
             if (savedPos && mainScrollRef.current) {
-                // Use a small timeout to ensure DOM is fully rendered
                 const timer = setTimeout(() => {
                     if (mainScrollRef.current) {
                         mainScrollRef.current.scrollTop = parseInt(savedPos, 10);
@@ -102,7 +98,10 @@ export default function Home() {
                     <SearchBar
                         query={searchState.query}
                         onChange={(val) => setSearchState(prev => ({ ...prev, query: val }))}
-                        onSearch={(e) => { e?.preventDefault(); handleSearch(searchState.query); }}
+                        onSearch={(e) => {
+                            e?.preventDefault();
+                            handleSearch(searchState.query);
+                        }}
                         isLoading={searchState.isLoading}
                     />
                     <p className="mt-4 text-sm text-slate-500">
@@ -190,7 +189,10 @@ export default function Home() {
                     readlist={activeList}
                     savedPapers={savedPapers}
                     onFindRelated={(p) => navigate(`/related-papers?paperId=${p.id}`)}
-                    onBackToSearch={() => { setActiveReadlistId(null); setTimeout(() => document.getElementById('search-input')?.focus(), 0); }}
+                    onBackToSearch={() => {
+                        setActiveReadlistId(null);
+                        setTimeout(() => document.getElementById('search-input')?.focus(), 0);
+                    }}
                 />
             ) : (
                 renderSearchContent()
