@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
     useNodesState,
     useEdgesState,
@@ -16,6 +16,8 @@ export const useRelatedPapersGraph = (
 ) => {
     const [nodes, setNodes, onNodesChange] = useNodesState<PaperNodeType>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+    const onFindRelatedRef = useRef<(paper: Paper) => Promise<void>>(async () => { });
 
     const onFindRelated = useCallback(async (paper: Paper) => {
         try {
@@ -50,7 +52,7 @@ export const useRelatedPapersGraph = (
                         type: 'paper',
                         data: {
                             paper: p,
-                            onFindRelated,
+                            onFindRelated: (p) => onFindRelatedRef.current(p),
                             isSaved: !!savedPapers[p.id],
                             onAddToReadlist: handleAddToReadlist
                         },
@@ -73,6 +75,10 @@ export const useRelatedPapersGraph = (
             console.error("Failed to expand graph:", err);
         }
     }, [setNodes, setEdges, savedPapers, handleAddToReadlist]);
+
+    useEffect(() => {
+        onFindRelatedRef.current = onFindRelated;
+    }, [onFindRelated]);
 
     useEffect(() => {
         if (!paperId) return;

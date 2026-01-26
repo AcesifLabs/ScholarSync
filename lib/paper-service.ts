@@ -12,11 +12,13 @@ const cleanJsonString = (str: string): string => {
 
 const searchWithGemini = async (query: string): Promise<Paper[]> => {
   if (!client) throw new Error("GEMINI_API_KEY is not configured");
-  
+
   try {
     const response = await client.models.generateContent({
       model: 'gemini-2.0-flash',
-      contents: [{ role: 'user', parts: [{ text: `Find 12 real, high-quality academic research papers related to the topic: "${query}".
+      contents: [{
+        role: 'user', parts: [{
+          text: `Find 12 real, high-quality academic research papers related to the topic: "${query}".
         You must return a valid JSON array of objects.
         Each object must have exactly these fields:
         - id: string (unique)
@@ -28,14 +30,14 @@ const searchWithGemini = async (query: string): Promise<Paper[]> => {
         - pdfUrl: string (a valid URL to the paper or its landing page)
         - isOpenAccess: boolean
         
-        Ensure the papers are real and citations are accurate.` }] }],
+        Ensure the papers are real and citations are accurate.` }]
+      }],
     });
 
-    // @ts-ignore
     const text = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const papers = JSON.parse(cleanJsonString(text));
-    return papers.map((p: any) => ({ 
-      ...p, 
+    return papers.map((p: any) => ({
+      ...p,
       source: p.source ? `${p.source} (via Gemini)` : "Gemini AI"
     }));
   } catch (err: any) {
@@ -46,11 +48,13 @@ const searchWithGemini = async (query: string): Promise<Paper[]> => {
 
 const recommendWithGemini = async (paper: Paper): Promise<Paper[]> => {
   if (!client) throw new Error("GEMINI_API_KEY is not configured");
-  
+
   try {
     const response = await client.models.generateContent({
       model: 'gemini-2.0-flash',
-      contents: [{ role: 'user', parts: [{ text: `Recommend 6 academic research papers similar or highly relevant to this paper:
+      contents: [{
+        role: 'user', parts: [{
+          text: `Recommend 6 academic research papers similar or highly relevant to this paper:
         Title: "${paper.title}"
         Authors: ${paper.authors.join(', ')}
         Abstract: ${paper.abstract.substring(0, 500)}...
@@ -65,10 +69,10 @@ const recommendWithGemini = async (paper: Paper): Promise<Paper[]> => {
         - source: string
         - pdfUrl: string
         - isOpenAccess: boolean
-        - relatedReason: string (one concise sentence explaining why this is relevant to the original paper)` }] }],
+        - relatedReason: string (one concise sentence explaining why this is relevant to the original paper)` }]
+      }],
     });
 
-    // @ts-ignore
     const text = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const papers = JSON.parse(cleanJsonString(text));
     return papers;
@@ -84,7 +88,7 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
     const offset = (page - 1) * limit;
     const headers: Record<string, string> = { 'Accept': 'application/json' };
     if (useKey && SEMANTIC_SCHOLAR_API_KEY) {
-        headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
+      headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
     }
 
     return await fetch(
@@ -107,7 +111,7 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
     }
 
     if (!response.ok) {
-        throw new Error(`Semantic Scholar API Error: ${response.status}`);
+      throw new Error(`Semantic Scholar API Error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -129,10 +133,10 @@ export const searchPapers = async (query: string, page: number = 1): Promise<{ p
   } catch (error) {
     console.warn("Falling back to Gemini due to search error:", error);
     try {
-        const papers = await searchWithGemini(query);
-        return { papers };
+      const papers = await searchWithGemini(query);
+      return { papers };
     } catch (fallbackError) {
-        throw error;
+      throw error;
     }
   }
 };
@@ -141,7 +145,7 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
   const tryFetch = async (useKey: boolean) => {
     const headers: Record<string, string> = { 'Accept': 'application/json' };
     if (useKey && SEMANTIC_SCHOLAR_API_KEY) {
-        headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
+      headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
     }
     return await fetch(
       `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
@@ -152,7 +156,7 @@ export const getPaperById = async (paperId: string): Promise<Paper> => {
   try {
     let response = await tryFetch(true);
     if (response.status === 403 && SEMANTIC_SCHOLAR_API_KEY) response = await tryFetch(false);
-    
+
     if (!response.ok) throw new Error(`Semantic Scholar Error: ${response.status}`);
 
     const p = await response.json();
@@ -178,7 +182,7 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
     const limit = 6;
     const headers: Record<string, string> = { 'Accept': 'application/json' };
     if (useKey && SEMANTIC_SCHOLAR_API_KEY) {
-        headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
+      headers['x-api-key'] = SEMANTIC_SCHOLAR_API_KEY.trim();
     }
     return await fetch(
       `https://api.semanticscholar.org/recommendations/v1/papers/forpaper/${paper.id}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
@@ -210,9 +214,9 @@ export const findRelatedPapers = async (paper: Paper): Promise<Paper[]> => {
   } catch (error) {
     console.warn("Falling back to Gemini due to recommendation error:", error);
     try {
-        return await recommendWithGemini(paper);
+      return await recommendWithGemini(paper);
     } catch (fallbackError) {
-        return [];
+      return [];
     }
   }
 };
