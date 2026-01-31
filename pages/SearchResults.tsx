@@ -24,7 +24,8 @@ export default function SearchResults() {
         activeQuery,
         handleSearch,
         handleLoadMore,
-        hasMore
+        hasMore,
+        clearSearch
     } = useSearch();
 
     const {
@@ -45,11 +46,9 @@ export default function SearchResults() {
     useEffect(() => {
         if (queryParam && queryParam !== activeQuery) {
             handleSearch(queryParam);
-        } else if (!queryParam) {
-            // If no query param, maybe redirect home or show empty state
-            // For now, let's just let useSearch handle it (it might show previous results)
+            handleCreateReadlist(queryParam);
         }
-    }, [queryParam, activeQuery, handleSearch]);
+    }, [queryParam, activeQuery, handleSearch, handleCreateReadlist]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -72,9 +71,19 @@ export default function SearchResults() {
         e?.preventDefault();
         const trimmedQuery = searchState.query.trim();
         if (trimmedQuery) {
+            handleCreateReadlist(trimmedQuery);
             setSearchParams({ q: trimmedQuery });
         }
     };
+
+    const handleStartNewReadlist = () => {
+        setActiveReadlistId(null);
+        clearSearch();
+        navigate('/');
+        setTimeout(() => document.getElementById('search-input')?.focus(), 0);
+    };
+
+    const activeList = readlists.find(l => l.id === activeReadlistId) || readlists[0];
 
     return (
         <MainLayout
@@ -89,6 +98,7 @@ export default function SearchResults() {
             setSidebarOpen={setSidebarOpen}
             showMobileMenuButton={hasResults || isInitialLoading || !!searchState.error}
             scrollRef={mainScrollRef}
+            onStartNewReadlist={handleStartNewReadlist}
         >
             <div className="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 shadow-sm transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
@@ -136,7 +146,7 @@ export default function SearchResults() {
                                     paper={paper}
                                     onAddToReadlist={handleAddToReadlist}
                                     onFindRelated={(p) => navigate(`/related-papers?paperId=${p.id}`)}
-                                    isSaved={!!savedPapers[paper.id] && readlists.some(l => l.paperIds.includes(paper.id))}
+                                    isSaved={!!savedPapers[paper.id] && !!activeList?.paperIds.includes(paper.id)}
                                 />
                             ))}
                         </div>

@@ -16,6 +16,7 @@ interface MainLayoutProps {
     setSidebarOpen: (open: boolean) => void;
     showMobileMenuButton?: boolean;
     scrollRef?: React.RefObject<HTMLDivElement | null>;
+    onStartNewReadlist: () => void;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -30,7 +31,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     isSidebarOpen,
     setSidebarOpen,
     showMobileMenuButton = true,
-    scrollRef
+    scrollRef,
+    onStartNewReadlist
 }) => {
     return (
         <div className="flex h-screen bg-slate-50/50">
@@ -47,6 +49,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                 onRemovePaper={handleRemoveFromReadlist}
                 isOpen={isSidebarOpen}
                 onClose={() => setSidebarOpen(false)}
+                onStartNewReadlist={() => {
+                    onStartNewReadlist();
+                    setSidebarOpen(false);
+                }}
             />
 
             <div className="flex-1 flex flex-col h-screen overflow-hidden">

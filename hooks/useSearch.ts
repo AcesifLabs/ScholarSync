@@ -105,12 +105,25 @@ export const useSearch = () => {
         }
     }, [searchState.isLoading, hasMore, activeQuery, page, trigger]);
 
+    const clearSearch = useCallback(() => {
+        setActiveQuery('');
+        setPage(1);
+        setHasMore(true);
+        setSearchState({
+            isLoading: false,
+            results: [],
+            error: null,
+            query: ''
+        });
+    }, []);
+
     return {
         searchState,
         setSearchState,
         activeQuery,
         handleSearch,
         handleLoadMore,
-        hasMore
+        hasMore,
+        clearSearch
     };
 };

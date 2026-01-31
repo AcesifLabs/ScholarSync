@@ -22,7 +22,8 @@ export default function Home() {
         activeQuery,
         handleSearch,
         handleLoadMore,
-        hasMore
+        hasMore,
+        clearSearch
     } = useSearch();
 
     const {
@@ -99,6 +100,7 @@ export default function Home() {
                         e?.preventDefault();
                         const trimmedQuery = searchState.query.trim();
                         if (trimmedQuery) {
+                            handleCreateReadlist(trimmedQuery);
                             navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
                         }
                     }}
@@ -109,6 +111,14 @@ export default function Home() {
                 </p>
             </div>
         );
+    };
+
+    const handleStartNewReadlist = () => {
+        setActiveReadlistId(null);
+        clearSearch();
+        navigate('/');
+        // Focus search bar
+        setTimeout(() => document.getElementById('search-input')?.focus(), 0);
     };
 
     return (
@@ -124,6 +134,7 @@ export default function Home() {
             setSidebarOpen={setSidebarOpen}
             showMobileMenuButton={!activeReadlistId}
             scrollRef={mainScrollRef}
+            onStartNewReadlist={handleStartNewReadlist}
         >
             {activeReadlistId && activeList ? (
                 <ReadlistDetail

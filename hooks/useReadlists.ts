@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Paper, Readlist } from '../types';
 
 export const useReadlists = () => {
@@ -12,7 +12,9 @@ export const useReadlists = () => {
         return saved ? JSON.parse(saved) : {};
     });
 
-    const [activeReadlistId, setActiveReadlistId] = useState<string | null>(null);
+    const [activeReadlistId, setActiveReadlistId] = useState<string | null>(() => {
+        return localStorage.getItem('scholar_active_list_id');
+    });
 
     useEffect(() => {
         localStorage.setItem('scholar_readlists', JSON.stringify(readlists));
@@ -22,24 +24,42 @@ export const useReadlists = () => {
         localStorage.setItem('scholar_papers', JSON.stringify(savedPapers));
     }, [savedPapers]);
 
-    const handleCreateReadlist = (name: string) => {
+    useEffect(() => {
+        if (activeReadlistId) {
+            localStorage.setItem('scholar_active_list_id', activeReadlistId);
+        } else {
+            localStorage.removeItem('scholar_active_list_id');
+        }
+    }, [activeReadlistId]);
+
+    const handleCreateReadlist = useCallback((name: string) => {
+        const trimmedName = name.trim();
+        if (!trimmedName) return;
+
+        // Check for existing list with same name
+        const existing = readlists.find(l => l.name.toLowerCase() === trimmedName.toLowerCase());
+        if (existing) {
+            setActiveReadlistId(existing.id);
+            return;
+        }
+
         const newList: Readlist = {
             id: `list-${Date.now()}`,
-            name,
+            name: trimmedName,
             paperIds: [],
             createdAt: Date.now()
         };
         setReadlists(prev => [...prev, newList]);
         setActiveReadlistId(newList.id);
-    };
+    }, [readlists]);
 
-    const handleDeleteReadlist = (id: string) => {
+    const handleDeleteReadlist = useCallback((id: string) => {
         setReadlists(prev => prev.filter(l => l.id !== id));
         if (activeReadlistId === id) setActiveReadlistId(null);
-    };
+    }, [activeReadlistId]);
 
-    const handleAddToReadlist = (paper: Paper) => {
-        const targetListId = activeReadlistId || readlists[0]?.id;
+    const handleAddToReadlist = useCallback((paper: Paper) => {
+        const targetListId = activeReadlistId || (readlists.length > 0 ? readlists[0].id : null);
         if (!targetListId) {
             alert("Please create a readlist first.");
             return;
@@ -53,16 +73,16 @@ export const useReadlists = () => {
             }
             return list;
         }));
-    };
+    }, [activeReadlistId, readlists]);
 
-    const handleRemoveFromReadlist = (listId: string, paperId: string) => {
+    const handleRemoveFromReadlist = useCallback((listId: string, paperId: string) => {
         setReadlists(prev => prev.map(list => {
             if (list.id === listId) {
                 return { ...list, paperIds: list.paperIds.filter(id => id !== paperId) };
             }
             return list;
         }));
-    };
+    }, []);
 
     return {
         readlists,

@@ -13,6 +13,7 @@ interface ReadlistSidebarProps {
   onRemovePaper: (listId: string, paperId: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  onStartNewReadlist: () => void;
 }
 
 export const ReadlistSidebar: React.FC<ReadlistSidebarProps> = ({
@@ -24,21 +25,10 @@ export const ReadlistSidebar: React.FC<ReadlistSidebarProps> = ({
   savedPapers,
   onRemovePaper,
   isOpen,
-  onClose
+  onClose,
+  onStartNewReadlist
 }) => {
-  const [newListName, setNewListName] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
   const [listIdToDelete, setListIdToDelete] = useState<string | null>(null);
-
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newListName.trim()) {
-      onCreateReadlist(newListName.trim());
-      setNewListName('');
-      setIsCreating(false);
-    }
-  };
-
   const activeList = readlists.find(r => r.id === activeReadlistId);
 
   return (
@@ -93,10 +83,10 @@ export const ReadlistSidebar: React.FC<ReadlistSidebarProps> = ({
             </div>
           ))}
 
-          {readlists.length === 0 && !isCreating && (
+          {readlists.length === 0 && (
             <div className="text-center py-8 text-slate-400 text-sm">
               No readlists yet.
-              <br />Create one to save papers.
+              <br />Start searching to create one.
             </div>
           )}
         </div>
@@ -130,43 +120,15 @@ export const ReadlistSidebar: React.FC<ReadlistSidebarProps> = ({
           </div>
         )}
 
-        {/* Create New List Button/Form */}
+        {/* New Readlist Button */}
         <div className="p-4 border-t border-slate-200 bg-white">
-          {isCreating ? (
-            <form onSubmit={handleCreate} className="space-y-2">
-              <input
-                type="text"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                placeholder="List Name (e.g., Thesis)"
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-scholar-500 focus:border-transparent"
-                autoFocus
-              />
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="flex-1 bg-scholar-600 text-white text-xs font-semibold py-2 rounded-md hover:bg-scholar-700 transition-colors"
-                >
-                  Create
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsCreating(false)}
-                  className="flex-1 bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-md hover:bg-slate-200 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="w-full flex items-center justify-center gap-2 bg-white border border-dashed border-slate-300 text-slate-600 hover:border-scholar-500 hover:text-scholar-600 text-sm font-medium py-2.5 rounded-lg transition-all"
-            >
-              <Plus size={16} />
-              New Readlist
-            </button>
-          )}
+          <button
+            onClick={onStartNewReadlist}
+            className="w-full flex items-center justify-center gap-2 bg-white border border-dashed border-slate-300 text-slate-600 hover:border-scholar-500 hover:text-scholar-600 text-sm font-medium py-2.5 rounded-lg transition-all"
+          >
+            <Plus size={16} />
+            New Readlist
+          </button>
         </div>
       </div>
 
