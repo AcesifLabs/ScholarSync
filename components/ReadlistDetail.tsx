@@ -8,13 +8,15 @@ interface ReadlistDetailProps {
     savedPapers: Record<string, Paper>;
     onFindRelated: (paper: Paper) => void;
     onBackToSearch: () => void;
+    onRemoveFromReadlist: (paper: Paper) => void;
 }
 
 export const ReadlistDetail: React.FC<ReadlistDetailProps> = ({
     readlist,
     savedPapers,
     onFindRelated,
-    onBackToSearch
+    onBackToSearch,
+    onRemoveFromReadlist
 }) => {
     const papersInList = readlist.paperIds.map(id => savedPapers[id]).filter(Boolean);
 
@@ -36,8 +38,10 @@ export const ReadlistDetail: React.FC<ReadlistDetailProps> = ({
                             key={paper.id}
                             paper={paper}
                             onAddToReadlist={() => { }}
+                            onRemoveFromReadlist={onRemoveFromReadlist}
                             onFindRelated={onFindRelated}
                             isSaved={true}
+                            activeReadlistName={readlist.name}
                         />
                     ))}
                 </div>

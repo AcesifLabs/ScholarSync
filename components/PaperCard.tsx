@@ -1,21 +1,34 @@
 import React, { useState } from 'react';
 import { Paper } from '../types';
-import { BookOpen, Share2, Plus, Check, ExternalLink, Sparkles, Lightbulb } from 'lucide-react';
+import { BookOpen, Share2, Plus, Check, ExternalLink, Sparkles, Lightbulb, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PaperDetailModal } from './PaperDetailModal';
+
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface PaperCardProps {
   paper: Paper;
   onAddToReadlist: (paper: Paper) => void;
+  onRemoveFromReadlist?: (paper: Paper) => void;
   onFindRelated: (paper: Paper) => void;
   isSaved: boolean;
+  activeReadlistName?: string;
 }
 
-export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, onFindRelated, isSaved }) => {
+export const PaperCard: React.FC<PaperCardProps> = ({
+  paper,
+  onAddToReadlist,
+  onRemoveFromReadlist,
+  onFindRelated,
+  isSaved,
+  activeReadlistName
+}) => {
   const [showModal, setShowModal] = useState(false);
+  const [showUnsaveModal, setShowUnsaveModal] = useState(false);
   const navigate = useNavigate();
 
   const handleReadPaper = () => {
+    // ... existing logic
     const url = paper.pdfUrl.toLowerCase();
     const isPotentialPdf = url.endsWith('.pdf') ||
       url.includes('printable') ||
@@ -29,10 +42,27 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
     }
   };
 
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isSaved && onRemoveFromReadlist) {
+      setShowUnsaveModal(true);
+    } else {
+      onAddToReadlist(paper);
+    }
+  };
+
+  const confirmUnsave = () => {
+    if (onRemoveFromReadlist) {
+      onRemoveFromReadlist(paper);
+    }
+    setShowUnsaveModal(false);
+  };
+
   return (
-    // ... (rest of the component keeps existing logic but updates the button onClick)
+    // ... same structure
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
       <div className="p-5 flex flex-col flex-grow">
+        {/* ... keeping content same ... */}
         <div className="flex justify-between items-start gap-4 mb-2">
           <span className={`text-xs font-semibold px-2 py-1 rounded-full ${paper.isOpenAccess ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
             {paper.isOpenAccess ? 'Open Access' : paper.source}
@@ -48,7 +78,6 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
           {paper.authors.join(', ')}
         </p>
 
-        {/* Related Reason Banner */}
         {paper.relatedReason && (
           <div className="mb-4 bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex gap-2.5 items-start">
             <Lightbulb className="text-indigo-600 flex-shrink-0 mt-0.5" size={16} />
@@ -95,14 +124,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
         </div>
 
         <button
-          onClick={() => onAddToReadlist(paper)}
+          onClick={handleToggleSave}
           className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${isSaved
-            ? 'text-green-700 bg-green-50 cursor-default'
+            ? 'text-green-700 bg-green-50 hover:bg-red-50 hover:text-red-600'
             : 'text-slate-600 hover:bg-slate-200'
             }`}
-          disabled={isSaved}
         >
-          {isSaved ? <Check size={16} /> : <Plus size={16} />}
+          {isSaved ? <Check size={16} className="group-hover:hidden" /> : <Plus size={16} />}
+          {isSaved && <span className="hidden group-hover:inline"><X size={16} /></span>}
           <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save'}</span>
         </button>
       </div>
@@ -115,6 +144,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, onAddToReadlist, on
         onFindRelated={onFindRelated}
         onRead={handleReadPaper}
         isSaved={isSaved}
+      />
+
+      <ConfirmationModal
+        isOpen={showUnsaveModal}
+        title="Remove from Readlist?"
+        message={`Do you want to remove this paper from the read list "${activeReadlistName || 'your list'}"?`}
+        confirmLabel="Remove"
+        onConfirm={confirmUnsave}
+        onCancel={() => setShowUnsaveModal(false)}
+        isDanger={true}
       />
     </div>
   );

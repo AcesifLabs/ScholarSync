@@ -141,6 +141,7 @@ export default function Home() {
                     readlist={activeList}
                     savedPapers={savedPapers}
                     onFindRelated={(p) => navigate(`/related-papers?paperId=${p.id}`)}
+                    onRemoveFromReadlist={(p) => handleRemoveFromReadlist(activeList.id, p.id)}
                     onBackToSearch={() => {
                         setActiveReadlistId(null);
                         setTimeout(() => document.getElementById('search-input')?.focus(), 0);

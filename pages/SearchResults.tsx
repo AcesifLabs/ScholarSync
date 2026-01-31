@@ -145,8 +145,10 @@ export default function SearchResults() {
                                     key={`${paper.id}-${index}`}
                                     paper={paper}
                                     onAddToReadlist={handleAddToReadlist}
+                                    onRemoveFromReadlist={(p) => activeReadlistId && handleRemoveFromReadlist(activeReadlistId, p.id)}
                                     onFindRelated={(p) => navigate(`/related-papers?paperId=${p.id}`)}
                                     isSaved={!!savedPapers[paper.id] && !!activeList?.paperIds.includes(paper.id)}
+                                    activeReadlistName={activeList?.name}
                                 />
                             ))}
                         </div>
