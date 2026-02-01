@@ -72,13 +72,13 @@ export const useReadLists = () => {
         ));
     }, []);
 
-    const handleDeleteReadlist = useCallback((id: string) => {
+    const handleDeleteReadList = useCallback((id: string) => {
         if (id === 'default') return; // Prevent deleting the default list
         setReadLists(prev => prev.filter(l => l.id !== id));
         if (activeReadListId === id) setActiveReadListId(null);
     }, [activeReadListId]);
 
-    const handleAddToReadlist = useCallback((paper: Paper, targetListId?: string) => {
+    const handleAddToReadList = useCallback((paper: Paper, targetListId?: string) => {
         const listToUse = targetListId || activeReadListId || (readLists.length > 0 ? readLists[0].id : null);
         if (!listToUse) {
             alert("Please create a readlist first.");
@@ -95,13 +95,19 @@ export const useReadLists = () => {
         }));
     }, [activeReadListId, readLists]);
 
-    const handleRemoveFromReadlist = useCallback((listId: string, paperId: string) => {
+    const handleRemoveFromReadList = useCallback((listId: string, paperId: string) => {
         setReadLists(prev => prev.map(list => {
             if (list.id === listId) {
                 return { ...list, paperIds: list.paperIds.filter(id => id !== paperId) };
             }
             return list;
         }));
+    }, []);
+
+    const handleUpdateReadListColor = useCallback((id: string, color: string) => {
+        setReadLists(prev => prev.map(list => 
+            list.id === id ? { ...list, color } : list
+        ));
     }, []);
 
     return {
@@ -111,9 +117,10 @@ export const useReadLists = () => {
         setActiveReadListId: setActiveReadListId,
         handleCreateReadList: handleCreateReadlist,
         handleRenameReadList,
-        handleDeleteReadList: handleDeleteReadlist,
-        handleAddToReadList: handleAddToReadlist,
-        handleRemoveFromReadList: handleRemoveFromReadlist,
+        handleUpdateReadListColor,
+        handleDeleteReadList,
+        handleAddToReadList,
+        handleRemoveFromReadList,
         isHydrated
     };
 };

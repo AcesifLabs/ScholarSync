@@ -10,8 +10,12 @@ interface MainLayoutProps {
     setActiveReadListId: (id: string | null) => void;
     handleCreateReadList: (name: string) => void;
     handleDeleteReadList: (id: string) => void;
+    handleRenameReadList: (id: string, name: string) => void;
+    handleUpdateReadListColor: (id: string, color: string) => void;
     savedPapers: Record<string, Paper>;
     handleRemoveFromReadList: (listId: string, paperId: string) => void;
+    onFindRelated?: (paper: Paper) => void;
+    onViewPaper?: (paper: Paper) => void;
     isSidebarOpen: boolean;
     setSidebarOpen: (open: boolean) => void;
     showMobileMenuButton?: boolean;
@@ -26,8 +30,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     setActiveReadListId,
     handleCreateReadList,
     handleDeleteReadList,
+    handleRenameReadList,
+    handleUpdateReadListColor,
     savedPapers,
     handleRemoveFromReadList,
+    onFindRelated,
+    onViewPaper,
     isSidebarOpen,
     setSidebarOpen,
     showMobileMenuButton = true,
@@ -45,8 +53,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                 }}
                 onCreateReadList={handleCreateReadList}
                 onDeleteReadList={handleDeleteReadList}
+                onRenameReadList={handleRenameReadList}
+                onUpdateReadListColor={handleUpdateReadListColor}
                 savedPapers={savedPapers}
                 onRemovePaper={handleRemoveFromReadList}
+                onFindRelated={onFindRelated}
+                onViewPaper={onViewPaper}
                 isOpen={isSidebarOpen}
                 onClose={() => setSidebarOpen(false)}
                 onStartNewReadList={() => {

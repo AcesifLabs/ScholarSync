@@ -28,6 +28,7 @@ export default function Home() {
         setActiveReadListId,
         handleCreateReadList,
         handleRenameReadList,
+        handleUpdateReadListColor,
         handleDeleteReadList,
         handleRemoveFromReadList
     } = useReadLists();
@@ -81,8 +82,12 @@ export default function Home() {
             setActiveReadListId={setActiveReadListId}
             handleCreateReadList={handleCreateReadList}
             handleDeleteReadList={handleDeleteReadList}
+            handleRenameReadList={handleRenameReadList}
+            handleUpdateReadListColor={handleUpdateReadListColor}
             savedPapers={savedPapers}
             handleRemoveFromReadList={handleRemoveFromReadList}
+            onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
+            onViewPaper={(p) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showMobileMenuButton={true}

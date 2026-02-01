@@ -42,6 +42,7 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         setActiveReadListId,
         handleCreateReadList,
         handleRenameReadList,
+        handleUpdateReadListColor,
         handleDeleteReadList,
         handleAddToReadList,
         handleRemoveFromReadList,
@@ -136,8 +137,12 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
             }}
             handleCreateReadList={handleCreateReadList}
             handleDeleteReadList={handleDeleteReadList}
+            handleRenameReadList={handleRenameReadList}
+            handleUpdateReadListColor={handleUpdateReadListColor}
             savedPapers={savedPapers}
             handleRemoveFromReadList={handleRemoveFromReadList}
+            onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
+            onViewPaper={(p) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showMobileMenuButton={hasResults || showSkeletons || !!searchState.error}

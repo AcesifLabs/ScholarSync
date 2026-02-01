@@ -17,6 +17,7 @@ export interface ReadingList {
   description?: string;
   paperIds: string[];
   createdAt: number;
+  color?: string;
 }
 
 export interface SearchState {
