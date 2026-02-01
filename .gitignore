@@ -24,3 +24,8 @@ dist-ssr
 *.sln
 *.sw?
 .worktrees/
+
+.next/
+out/
+build/
+.env*.local
