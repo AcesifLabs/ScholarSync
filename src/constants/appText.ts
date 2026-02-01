@@ -1,9 +1,9 @@
 export const API_URLS = {
-    SEMANTIC_SCHOLAR_SEARCH: (query: string, offset: number, limit: number) => 
+    SEMANTIC_SCHOLAR_SEARCH: (query: string, offset: number, limit: number) =>
         `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
-    SEMANTIC_SCHOLAR_PAPER: (paperId: string) => 
+    SEMANTIC_SCHOLAR_PAPER: (paperId: string) =>
         `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
-    SEMANTIC_SCHOLAR_RECOMMENDATIONS: (paperId: string, limit: number) => 
+    SEMANTIC_SCHOLAR_RECOMMENDATIONS: (paperId: string, limit: number) =>
         `https://api.semanticscholar.org/recommendations/v1/papers/forpaper/${paperId}?limit=${limit}&fields=paperId,title,authors,year,abstract,url,isOpenAccess,openAccessPdf,venue`,
     ARXIV_PDF: (arxivId: string) => `https://arxiv.org/pdf/${arxivId}`,
     SEMANTIC_SCHOLAR_WEB: (paperId: string) => `https://www.semanticscholar.org/paper/${paperId}`,
@@ -24,7 +24,7 @@ export const ERROR_MESSAGES = {
 export const UI_TEXT = {
     APP_NAME: "ScholarSync",
     YOUR_LIBRARY: "Your Library",
-    NEW_READLIST: "New Readlist",
+    NEW_READLIST: "New Read List",
     UNTITLED_READ_LIST: "Untitled Read List",
     UNTITLED_LIST: "Untitled List",
     UNTITLED_READING_LIST: "Untitled Reading List",
@@ -46,16 +46,6 @@ export const UI_TEXT = {
     OPEN_ACCESS: "Open Access",
     SEARCH_PLACEHOLDER: "Search for topics...",
     RESULTS_FOR: (query: string) => `Results for "${query}"`,
-};
-
-export const STORAGE_KEYS = {
-    READLISTS: 'scholar_readlists',
-    PAPERS: 'scholar_papers',
-    ACTIVE_LIST_ID: 'scholar_active_list_id',
-    SEARCH_STATE: 'scholar_search_state',
-    ACTIVE_QUERY: 'scholar_active_query',
-    PAGE: 'scholar_page',
-    HAS_MORE: 'scholar_has_more',
 };
 
 export const AI_PROMPTS = {

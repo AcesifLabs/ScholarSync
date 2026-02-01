@@ -2,6 +2,7 @@ import 'server-only';
 import { Paper, SSPaper, SSSearchResponse, SSRecResponse } from "@/types";
 import { extractArxivPdfUrl } from "@/lib/paperServiceUtils";
 import { API_URLS } from "@/constants/appText";
+import { getCachedSearch, setCachedSearch } from "@/lib/db/cacheQueries";
 
 const SEMANTIC_SCHOLAR_API_KEY = process.env.NEXT_PUBLIC_SEMANTIC_SCHOLAR_API_KEY!;
 
@@ -71,6 +72,10 @@ function mapToPaper(p: SSPaper): Paper {
 }
 
 export async function fetchPapersServer(query: string, page: number = 1): Promise<Paper[]> {
+    // Try to get from cache first
+    const cached = await getCachedSearch(query, page);
+    if (cached) return cached;
+
     const limit = 12;
     const offset = (page - 1) * limit;
     const url = API_URLS.SEMANTIC_SCHOLAR_SEARCH(query, offset, limit);
@@ -81,7 +86,14 @@ export async function fetchPapersServer(query: string, page: number = 1): Promis
         return [];
     }
 
-    return data.data.map(mapToPaper);
+    const papers = data.data.map(mapToPaper);
+    
+    // Save to cache
+    if (papers.length > 0) {
+        await setCachedSearch(query, page, papers);
+    }
+    
+    return papers;
 }
 
 export async function getPaperByIdServer(paperId: string): Promise<Paper | null> {

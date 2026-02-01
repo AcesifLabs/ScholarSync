@@ -45,7 +45,8 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         handleDeleteReadList,
         handleAddToReadList,
         handleRemoveFromReadList,
-        isHydrated
+        isHydrated,
+        isLoggedIn
     } = useReadLists();
 
     const isSyncing = queryParam && queryParam !== activeQuery;
@@ -64,16 +65,19 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
     useEffect(() => {
         if (isSyncing && isHydrated && searchState.query !== '') {
             handleSearch(queryParam);
-            
-            const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
-            
-            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
-                handleRenameReadList(listToRename.id, queryParam);
-            } else {
-                handleCreateReadList(queryParam);
+
+            // Only perform automatic list management if logged in
+            if (isLoggedIn) {
+                const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
+
+                if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
+                    handleRenameReadList(listToRename.id, queryParam);
+                } else {
+                    handleCreateReadList(queryParam);
+                }
             }
         }
-    }, [queryParam, activeQuery, handleSearch, handleCreateReadList, handleRenameReadList, isSyncing, activeReadListId, readLists, isHydrated, searchState.query]);
+    }, [queryParam, activeQuery, handleSearch, handleCreateReadList, handleRenameReadList, isSyncing, activeReadListId, readLists, isHydrated, searchState.query, isLoggedIn]);
 
     const showSkeletons = (searchState.isLoading && searchState.results.length === 0) || isSyncing || initialLoad;
     const hasResults = searchState.results.length > 0;
@@ -99,12 +103,14 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         e?.preventDefault();
         const trimmedQuery = searchState.query.trim();
         if (trimmedQuery) {
-            const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
-            
-            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
-                handleRenameReadList(listToRename.id, trimmedQuery);
-            } else {
-                handleCreateReadList(trimmedQuery);
+            if (isLoggedIn) {
+                const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
+
+                if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
+                    handleRenameReadList(listToRename.id, trimmedQuery);
+                } else {
+                    handleCreateReadList(trimmedQuery);
+                }
             }
             router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
         }
@@ -123,30 +129,26 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         <MainLayout
             readLists={readLists}
             activeReadListId={activeReadListId}
-            setActiveReadListId={(id) => {
+            setActiveReadListIdAction={(id) => {
                 setActiveReadListId(id);
                 if (id) router.push('/');
             }}
-            handleCreateReadList={handleCreateReadList}
-            handleDeleteReadList={handleDeleteReadList}
-            handleRenameReadList={handleRenameReadList}
-            handleUpdateReadListColor={handleUpdateReadListColor}
+            handleCreateReadListAction={handleCreateReadList}
+            handleDeleteReadListAction={handleDeleteReadList}
+            handleRenameReadListAction={handleRenameReadList}
+            handleUpdateReadListColorAction={handleUpdateReadListColor}
             savedPapers={savedPapers}
-            handleRemoveFromReadList={handleRemoveFromReadList}
+            handleRemoveFromReadListAction={handleRemoveFromReadList}
             onFindRelatedAction={(p: Paper) => router.push(`/related-papers?paperId=${p.id}`)}
             onViewPaper={(p: Paper) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
-            setSidebarOpen={setSidebarOpen}
+            setSidebarOpenAction={setSidebarOpen}
             showMobileMenuButton={hasResults || showSkeletons || !!searchState.error}
             scrollRef={mainScrollRef}
-            onStartNewReadList={handleStartNewReadList}
+            onStartNewReadListAction={handleStartNewReadList}
         >
             <div className="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 shadow-sm transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-2 mr-4 cursor-pointer" onClick={() => router.push('/')}>
-                        <GraduationCap className="text-scholar-600" size={24} />
-                        <span className="font-bold text-slate-800">{UI_TEXT.APP_NAME}</span>
-                    </div>
                     <SearchBar
                         query={searchState.query}
                         onChange={(val) => setSearchState(prev => ({ ...prev, query: val }))}

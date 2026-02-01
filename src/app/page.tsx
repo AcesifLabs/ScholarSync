@@ -30,7 +30,8 @@ export default function Home() {
         handleRenameReadList,
         handleUpdateReadListColor,
         handleDeleteReadList,
-        handleRemoveFromReadList
+        handleRemoveFromReadList,
+        isLoggedIn
     } = useReadLists();
 
     const activeList = readLists.find(r => r.id === activeReadListId);
@@ -50,10 +51,12 @@ export default function Home() {
                         const trimmedQuery = searchState.query.trim();
                         if (trimmedQuery) {
                             // Find the list to rename - either the specific active list or the default one if no active list is set
-                            const listToRename = activeList || readLists.find(l => l.id === 'default');
+                            if (isLoggedIn) {
+                                const listToRename = activeList || readLists.find(l => l.id === 'default');
 
-                            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
-                                handleRenameReadList(listToRename.id, trimmedQuery);
+                                if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
+                                    handleRenameReadList(listToRename.id, trimmedQuery);
+                                }
                             }
                             router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
                         }
@@ -79,20 +82,20 @@ export default function Home() {
         <MainLayout
             readLists={readLists}
             activeReadListId={activeReadListId}
-            setActiveReadListId={setActiveReadListId}
-            handleCreateReadList={handleCreateReadList}
-            handleDeleteReadList={handleDeleteReadList}
-            handleRenameReadList={handleRenameReadList}
-            handleUpdateReadListColor={handleUpdateReadListColor}
+            setActiveReadListIdAction={setActiveReadListId}
+            handleCreateReadListAction={handleCreateReadList}
+            handleDeleteReadListAction={handleDeleteReadList}
+            handleRenameReadListAction={handleRenameReadList}
+            handleUpdateReadListColorAction={handleUpdateReadListColor}
             savedPapers={savedPapers}
-            handleRemoveFromReadList={handleRemoveFromReadList}
+            handleRemoveFromReadListAction={handleRemoveFromReadList}
             onFindRelatedAction={(p) => router.push(`/related-papers?paperId=${p.id}`)}
             onViewPaper={(p) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
-            setSidebarOpen={setSidebarOpen}
+            setSidebarOpenAction={setSidebarOpen}
             showMobileMenuButton={true}
             scrollRef={mainScrollRef}
-            onStartNewReadList={handleStartNewReadlist}
+            onStartNewReadListAction={handleStartNewReadlist}
         >
             {activeReadListId && activeList && activeList.paperIds.length > 0 ? (
                 <ReadListDetail
@@ -101,10 +104,6 @@ export default function Home() {
                     onFindRelatedAction={(p) => router.push(`/related-papers?paperId=${p.id}`)}
                     onRemoveFromReadList={(p) => handleRemoveFromReadList(activeList.id, p.id)}
                     readLists={readLists}
-                    onBackToSearch={() => {
-                        setActiveReadListId(null);
-                        setTimeout(() => document.getElementById('search-input')?.focus(), 0);
-                    }}
                 />
             ) : (
                 <div className="flex flex-col h-full">

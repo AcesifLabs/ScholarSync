@@ -1,0 +1,146 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  name          String?
+  emailVerified Boolean         @default(false) @map("email_verified")
+  image         String?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  
+  sessions      Session[]
+  accounts      Account[]
+  readingLists  ReadingList[]
+  searchHistory SearchHistory[]
+  
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Paper {
+  id              String           @id
+  title           String
+  authors         Json
+  abstract        String?
+  year            Int?
+  source          String?
+  pdfUrl          String?          @map("pdf_url")
+  isOpenAccess    Boolean          @default(false) @map("is_open_access")
+  openAccessPdf   Json?            @map("open_access_pdf")
+  venue           String?
+  citationCount   Int              @default(0) @map("citation_count")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  
+  readingListPapers ReadingListPaper[]
+  
+  @@map("papers")
+}
+
+model ReadingList {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  name        String
+  description String?
+  color       String   @default("#3B82F6")
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  papers      ReadingListPaper[]
+  
+  @@index([userId])
+  @@map("reading_lists")
+}
+
+model ReadingListPaper {
+  id            String   @id @default(uuid())
+  readingListId String   @map("reading_list_id")
+  paperId       String   @map("paper_id")
+  addedAt       DateTime @default(now()) @map("added_at")
+  notes         String?
+  
+  readingList   ReadingList @relation(fields: [readingListId], references: [id], onDelete: Cascade)
+  paper         Paper       @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  
+  @@unique([readingListId, paperId])
+  @@index([readingListId])
+  @@index([paperId])
+  @@map("reading_list_papers")
+}
+
+model SearchHistory {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  query         String
+  resultsCount  Int?     @map("results_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("search_history")
+}
+
+model Cache {
+  key        String   @id
+  value      Json
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("cache")
+}

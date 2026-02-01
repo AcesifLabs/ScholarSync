@@ -2,12 +2,15 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ReadListSidebarProps } from '@/types';
-import { Library, Plus, X, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Library, Plus, X, MoreVertical, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ReadListContextMenu } from './ReadListContextMenu';
 import { PaperContextMenu } from './PaperContextMenu';
 import { UI_TEXT } from '@/constants/appText';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useSession, signIn } from '@/lib/auth-client';
+import Link from 'next/link';
+import { GoogleIcon } from './icons/GoogleIcon';
 
 export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
   readLists,
@@ -27,6 +30,7 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
   onToggleCollapse
 }) => {
   useBodyScrollLock(isOpen);
+  const { data: session } = useSession();
 
   const [listIdToDelete, setListIdToDelete] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{

@@ -29,20 +29,20 @@ export interface MainLayoutProps {
     children: React.ReactNode;
     readLists: ReadingList[];
     activeReadListId: string | null;
-    setActiveReadListId: (id: string | null) => void;
-    handleCreateReadList: (name: string) => void;
-    handleDeleteReadList: (id: string) => void;
-    handleRenameReadList: (id: string, name: string) => void;
-    handleUpdateReadListColor: (id: string, color: string) => void;
+    setActiveReadListIdAction: (id: string | null) => void;
+    handleCreateReadListAction: (name: string) => void;
+    handleDeleteReadListAction: (id: string) => void;
+    handleRenameReadListAction: (id: string, name: string) => void;
+    handleUpdateReadListColorAction: (id: string, color: string) => void;
     savedPapers: Record<string, Paper>;
-    handleRemoveFromReadList: (listId: string, paperId: string) => void;
+    handleRemoveFromReadListAction: (listId: string, paperId: string) => void;
     onFindRelatedAction?: (paper: Paper) => void;
     onViewPaper?: (paper: Paper) => void;
     isSidebarOpen: boolean;
-    setSidebarOpen: (open: boolean) => void;
+    setSidebarOpenAction: (open: boolean) => void;
     showMobileMenuButton?: boolean;
     scrollRef?: React.RefObject<HTMLDivElement | null>;
-    onStartNewReadList: () => void;
+    onStartNewReadListAction: () => void;
 }
 
 export interface PaperCardProps {
@@ -70,7 +70,6 @@ export interface ReadListDetailProps {
     savedPapers: Record<string, Paper>;
     onRemoveFromReadList: (paper: Paper) => void;
     onFindRelatedAction: (paper: Paper) => void;
-    onBackToSearch: () => void;
     readLists: ReadingList[];
 }
 

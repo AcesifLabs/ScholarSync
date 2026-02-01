@@ -8,7 +8,6 @@ export const ReadListDetail: React.FC<ReadListDetailProps> = ({
     readList,
     savedPapers,
     onFindRelatedAction,
-    onBackToSearch,
     onRemoveFromReadList,
     readLists
 }) => {
@@ -21,16 +20,10 @@ export const ReadListDetail: React.FC<ReadListDetailProps> = ({
                     <h2 className="text-2xl font-bold text-slate-800">{readList.name}</h2>
                     <p className="text-slate-500">{UI_TEXT.PAPERS_SAVED(papersInList.length)}</p>
                 </div>
-                <button
-                    onClick={onBackToSearch}
-                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-scholar-50 text-scholar-700 font-bold rounded-xl hover:bg-scholar-100 transition-all border border-scholar-200"
-                >
-                    {UI_TEXT.BACK_TO_SEARCH}
-                </button>
             </div>
 
             {papersInList.length === 0 ? (
-                <EmptyState onStartSearching={onBackToSearch} />
+                <EmptyState />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     {papersInList.map((paper, index) => (
