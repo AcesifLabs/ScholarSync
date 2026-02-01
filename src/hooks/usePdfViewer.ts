@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGetPaperByIdQuery } from '@/services/paperApi';
+import { ERROR_MESSAGES } from '@/constants/appText';
 
 export const usePdfViewer = (id: string | undefined) => {
     const { data: paper, isLoading: isPaperLoading, error: paperError } = useGetPaperByIdQuery(id!, {
@@ -15,8 +16,6 @@ export const usePdfViewer = (id: string | undefined) => {
 
             const url = paper.pdfUrl.toLowerCase();
 
-
-
             if (url.endsWith('.pdf')) {
                 setIsPdf(true);
             } else {
@@ -28,7 +27,7 @@ export const usePdfViewer = (id: string | undefined) => {
                     } else {
                         setIsPdf(paper.isOpenAccess);
                     }
-                } catch (e) {
+                } catch {
                     setIsPdf(url.includes('printable') || url.includes('download'));
                 } finally {
                     setVerifyingPdf(false);
@@ -44,7 +43,7 @@ export const usePdfViewer = (id: string | undefined) => {
     return {
         paper,
         loading: isPaperLoading,
-        error: paperError ? "Failed to load paper details. Please try again." : null,
+        error: paperError ? ERROR_MESSAGES.PDF_LOAD_FAILED : null,
         isPdf,
         verifyingPdf
     };

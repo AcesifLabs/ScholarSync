@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Paper, ReadingList } from '@/types';
+import { Paper, ReadingList, UseReadListsReturn } from '@/types';
+import { STORAGE_KEYS, ERROR_MESSAGES, UI_TEXT } from '@/constants/appText';
 
-export const useReadLists = () => {
-    const [readLists, setReadLists] = useState<ReadingList[]>([{ id: 'default', name: 'Untitled Read List', paperIds: [], createdAt: Date.now() }]);
+export const useReadLists = (): UseReadListsReturn => {
+    const [readLists, setReadLists] = useState<ReadingList[]>([{ id: 'default', name: UI_TEXT.UNTITLED_READ_LIST, paperIds: [], createdAt: Date.now() }]);
 
     const [savedPapers, setSavedPapers] = useState<Record<string, Paper>>({});
 
@@ -11,13 +12,13 @@ export const useReadLists = () => {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const savedLists = localStorage.getItem('scholar_readlists');
+            const savedLists = localStorage.getItem(STORAGE_KEYS.READLISTS);
             if (savedLists) setReadLists(JSON.parse(savedLists));
 
-            const savedPapers = localStorage.getItem('scholar_papers');
+            const savedPapers = localStorage.getItem(STORAGE_KEYS.PAPERS);
             if (savedPapers) setSavedPapers(JSON.parse(savedPapers));
 
-            const savedActiveId = localStorage.getItem('scholar_active_list_id');
+            const savedActiveId = localStorage.getItem(STORAGE_KEYS.ACTIVE_LIST_ID);
             if (savedActiveId) setActiveReadListId(savedActiveId);
             
             setIsHydrated(true);
@@ -26,22 +27,22 @@ export const useReadLists = () => {
 
     useEffect(() => {
         if (isHydrated) {
-            localStorage.setItem('scholar_readlists', JSON.stringify(readLists));
+            localStorage.setItem(STORAGE_KEYS.READLISTS, JSON.stringify(readLists));
         }
     }, [readLists, isHydrated]);
 
     useEffect(() => {
         if (isHydrated) {
-            localStorage.setItem('scholar_papers', JSON.stringify(savedPapers));
+            localStorage.setItem(STORAGE_KEYS.PAPERS, JSON.stringify(savedPapers));
         }
     }, [savedPapers, isHydrated]);
 
     useEffect(() => {
         if (isHydrated) {
             if (activeReadListId) {
-                localStorage.setItem('scholar_active_list_id', activeReadListId);
+                localStorage.setItem(STORAGE_KEYS.ACTIVE_LIST_ID, activeReadListId);
             } else {
-                localStorage.removeItem('scholar_active_list_id');
+                localStorage.removeItem(STORAGE_KEYS.ACTIVE_LIST_ID);
             }
         }
     }, [activeReadListId, isHydrated]);
@@ -81,7 +82,7 @@ export const useReadLists = () => {
     const handleAddToReadList = useCallback((paper: Paper, targetListId?: string) => {
         const listToUse = targetListId || activeReadListId || (readLists.length > 0 ? readLists[0].id : null);
         if (!listToUse) {
-            alert("Please create a readlist first.");
+            alert(ERROR_MESSAGES.CREATE_LIST_FIRST);
             return;
         }
 

@@ -1,28 +1,13 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
-import { ReadingList, Paper } from '@/types';
+import { ReadListSidebarProps } from '@/types';
 import { Library, Plus, X, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ReadListContextMenu } from './ReadListContextMenu';
 import { PaperContextMenu } from './PaperContextMenu';
-
-interface ReadListSidebarProps {
-  readLists: ReadingList[];
-  activeReadListId: string | null;
-  onSelectReadList: (id: string | null) => void;
-  onCreateReadList: (name: string) => void;
-  onDeleteReadList: (id: string) => void;
-  onRenameReadList: (id: string, name: string) => void;
-  onUpdateReadListColor: (id: string, color: string) => void;
-  savedPapers: Record<string, Paper>;
-  onRemovePaper: (listId: string, paperId: string) => void;
-  onFindRelated?: (paper: Paper) => void;
-  onViewPaper?: (paper: Paper) => void;
-  isOpen: boolean;
-  onClose: () => void;
-  onStartNewReadList: () => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
-}
+import { UI_TEXT } from '@/constants/appText';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
   readLists,
@@ -33,7 +18,7 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
   onUpdateReadListColor,
   savedPapers,
   onRemovePaper,
-  onFindRelated,
+  onFindRelatedAction,
   onViewPaper,
   isOpen,
   onClose,
@@ -41,6 +26,8 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse
 }) => {
+  useBodyScrollLock(isOpen);
+
   const [listIdToDelete, setListIdToDelete] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean;
@@ -114,7 +101,7 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
         <div className={`p-4 border-b border-slate-100 flex ${isCollapsed ? 'justify-center' : 'justify-between'} items-center bg-slate-50 overflow-hidden`}>
           <div className="flex items-center gap-2 text-slate-800 font-semibold overflow-hidden">
             <Library className="text-scholar-600 flex-shrink-0" size={20} />
-            {!isCollapsed && <h2 className="truncate">Your Library</h2>}
+            {!isCollapsed && <h2 className="truncate">{UI_TEXT.YOUR_LIBRARY}</h2>}
           </div>
           <div className="flex items-center gap-1">
             {onToggleCollapse && (
@@ -240,10 +227,10 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
           <button
             onClick={onStartNewReadList}
             className={`w-full flex items-center justify-center gap-2 bg-white border border-dashed border-slate-300 text-slate-600 hover:border-scholar-500 hover:text-scholar-600 text-sm font-medium py-2.5 rounded-lg transition-all ${isCollapsed ? 'px-0' : ''}`}
-            title={isCollapsed ? "New Readlist" : ""}
+            title={isCollapsed ? UI_TEXT.NEW_READLIST : ""}
           >
             <Plus size={16} />
-            {!isCollapsed && <span>New Readlist</span>}
+            {!isCollapsed && <span>{UI_TEXT.NEW_READLIST}</span>}
           </button>
         </div>
       </div>
@@ -287,19 +274,19 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
             if (paper) onViewPaper(paper);
           }
         }}
-        onFindRelated={() => {
-          if (paperContextMenu.paperId && onFindRelated) {
+        onFindRelatedAction={() => {
+          if (paperContextMenu.paperId && onFindRelatedAction) {
             const paper = savedPapers[paperContextMenu.paperId];
-            if (paper) onFindRelated(paper);
+            if (paper) onFindRelatedAction(paper);
           }
         }}
       />
 
       <ConfirmationModal
         isOpen={!!listIdToDelete}
-        title="Delete Readlist?"
-        message="Are you sure you want to delete this readlist? This action cannot be undone."
-        confirmLabel="Delete List"
+        title={UI_TEXT.DELETE_LIST_CONFIRM_TITLE}
+        message={UI_TEXT.DELETE_LIST_CONFIRM_MESSAGE}
+        confirmLabel={UI_TEXT.DELETE_LIST}
         onConfirm={() => listIdToDelete && onDeleteReadList(listIdToDelete)}
         onCancel={() => setListIdToDelete(null)}
         isDanger={true}

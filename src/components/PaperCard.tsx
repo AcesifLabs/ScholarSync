@@ -1,33 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Paper } from '../types';
-import { BookOpen, Share2, Plus, Check, ExternalLink, Sparkles, Lightbulb, X } from 'lucide-react';
+import { PaperCardProps } from '@/types';
+import { BookOpen, Plus, Check, ExternalLink, Sparkles, Lightbulb, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PaperDetailModal } from './PaperDetailModal';
-
 import { ConfirmationModal } from './ConfirmationModal';
 import { ContextMenu } from './ContextMenu';
-import { ReadingList } from '../types';
-
-interface PaperCardProps {
-  paper: Paper;
-  onAddToReadlist: (paper: Paper, targetListId?: string) => void;
-  onRemoveFromReadlist?: (paper: Paper) => void;
-  onFindRelated: (paper: Paper) => void;
-  isSaved: boolean;
-  activeReadlistName?: string;
-  readlists: ReadingList[];
-}
+import { UI_TEXT } from '@/constants/appText';
 
 export const PaperCard: React.FC<PaperCardProps> = ({
   paper,
-  onAddToReadlist,
-  onRemoveFromReadlist,
-  onFindRelated,
+  onAddToReadListAction,
+  onRemoveFromReadList,
+  onFindRelatedAction,
   isSaved,
-  activeReadlistName,
-  readlists
+  activeReadListName,
+  readLists
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showUnsaveModal, setShowUnsaveModal] = useState(false);
@@ -41,7 +30,6 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const router = useRouter();
 
   const handleReadPaper = () => {
-    // ... existing logic
     const url = paper.pdfUrl.toLowerCase();
     const isPotentialPdf = url.endsWith('.pdf') ||
       url.includes('printable') ||
@@ -57,10 +45,10 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
   const handleToggleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isSaved && onRemoveFromReadlist) {
+    if (isSaved && onRemoveFromReadList) {
       setShowUnsaveModal(true);
     } else {
-      onAddToReadlist(paper);
+      onAddToReadListAction(paper);
     }
   };
 
@@ -74,20 +62,18 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   };
 
   const confirmUnsave = () => {
-    if (onRemoveFromReadlist) {
-      onRemoveFromReadlist(paper);
+    if (onRemoveFromReadList) {
+      onRemoveFromReadList(paper);
     }
     setShowUnsaveModal(false);
   };
 
   return (
-    // ... same structure
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
       <div className="p-5 flex flex-col flex-grow">
-        {/* ... keeping content same ... */}
         <div className="flex justify-between items-start gap-4 mb-2">
           <span className={`text-xs font-semibold px-2 py-1 rounded-full ${paper.isOpenAccess ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
-            {paper.isOpenAccess ? 'Open Access' : paper.source}
+            {paper.isOpenAccess ? UI_TEXT.OPEN_ACCESS : paper.source}
           </span>
           <span className="text-xs text-slate-500 font-medium">{paper.year}</span>
         </div>
@@ -129,14 +115,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           <button
             onClick={handleReadPaper}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-scholar-700 bg-scholar-50 hover:bg-scholar-100 rounded-md transition-colors"
-            title="Read Paper"
+            title={UI_TEXT.READ_PAPER}
           >
             <BookOpen size={16} />
             <span className="hidden sm:inline">Read</span>
           </button>
 
           <button
-            onClick={() => onFindRelated(paper)}
+            onClick={() => onFindRelatedAction(paper)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-md transition-colors"
             title="Find Related Papers"
           >
@@ -163,8 +149,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         paper={paper}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onAddToReadList={onAddToReadlist}
-        onFindRelated={onFindRelated}
+        onAddToReadListAction={onAddToReadListAction}
+        onFindRelatedAction={onFindRelatedAction}
         onRead={handleReadPaper}
         isSaved={isSaved}
       />
@@ -172,7 +158,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       <ConfirmationModal
         isOpen={showUnsaveModal}
         title="Remove from Readlist?"
-        message={`Do you want to remove this paper from the read list "${activeReadlistName || 'your list'}"?`}
+        message={`Do you want to remove this paper from the read list "${activeReadListName || 'your list'}"?`}
         confirmLabel="Remove"
         onConfirm={confirmUnsave}
         onCancel={() => setShowUnsaveModal(false)}
@@ -183,8 +169,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         isOpen={contextMenuState.isOpen}
         position={contextMenuState.position}
         onClose={() => setContextMenuState(prev => ({ ...prev, isOpen: false }))}
-        readLists={readlists}
-        onSelectReadList={(id) => onAddToReadlist(paper, id)}
+        readLists={readLists}
+        onSelectReadList={(id) => onAddToReadListAction(paper, id)}
       />
     </div>
   );

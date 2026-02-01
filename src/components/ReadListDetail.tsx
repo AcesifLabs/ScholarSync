@@ -1,21 +1,13 @@
 import React from 'react';
-import { Paper, ReadingList } from '@/types';
+import { ReadListDetailProps } from '@/types';
 import { PaperCard } from './PaperCard';
 import { EmptyState } from './EmptyState';
-
-interface ReadListDetailProps {
-    readList: ReadingList;
-    savedPapers: Record<string, Paper>;
-    onFindRelated: (paper: Paper) => void;
-    onBackToSearch: () => void;
-    onRemoveFromReadList: (paper: Paper) => void;
-    readLists: ReadingList[];
-}
+import { UI_TEXT } from '@/constants/appText';
 
 export const ReadListDetail: React.FC<ReadListDetailProps> = ({
     readList,
     savedPapers,
-    onFindRelated,
+    onFindRelatedAction,
     onBackToSearch,
     onRemoveFromReadList,
     readLists
@@ -27,24 +19,29 @@ export const ReadListDetail: React.FC<ReadListDetailProps> = ({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-800">{readList.name}</h2>
-                    <p className="text-slate-500">{papersInList.length} papers saved</p>
+                    <p className="text-slate-500">{UI_TEXT.PAPERS_SAVED(papersInList.length)}</p>
                 </div>
+                <button
+                    onClick={onBackToSearch}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-scholar-50 text-scholar-700 font-bold rounded-xl hover:bg-scholar-100 transition-all border border-scholar-200"
+                >
+                    {UI_TEXT.BACK_TO_SEARCH}
+                </button>
             </div>
 
             {papersInList.length === 0 ? (
                 <EmptyState onStartSearching={onBackToSearch} />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {papersInList.map(paper => (
+                    {papersInList.map((paper, index) => (
                         <PaperCard
-                            key={paper.id}
+                            key={`${paper.id}-${index}`}
                             paper={paper}
-                            onAddToReadlist={() => { }}
-                            onRemoveFromReadlist={onRemoveFromReadList}
-                            onFindRelated={onFindRelated}
+                            onAddToReadListAction={() => { }}
+                            onRemoveFromReadList={onRemoveFromReadList}
+                            onFindRelatedAction={onFindRelatedAction}
                             isSaved={true}
-                            activeReadlistName={readList.name}
-                            readlists={readLists}
+                            readLists={readLists}
                         />
                     ))}
                 </div>

@@ -1,17 +1,7 @@
 import React, { memo } from 'react';
-import { Handle, Position, NodeProps, Node } from '@xyflow/react';
-import { Paper, ReadingList } from '@/types';
+import { Handle, Position, NodeProps } from '@xyflow/react';
+import { PaperNodeType } from '@/types';
 import { PaperCard } from './PaperCard';
-
-export type PaperNodeData = {
-  paper: Paper;
-  onFindRelated: (paper: Paper) => void;
-  isSaved: boolean;
-  onAddToReadList: (paper: Paper, targetListId?: string) => void;
-  readLists: ReadingList[];
-};
-
-export type PaperNodeType = Node<PaperNodeData, 'paper'>;
 
 export const PaperNode = memo(({ data }: NodeProps<PaperNodeType>) => {
   return (
@@ -24,10 +14,10 @@ export const PaperNode = memo(({ data }: NodeProps<PaperNodeType>) => {
       <div className="bg-white rounded-xl shadow-xl border-2 border-slate-100 overflow-hidden hover:border-scholar-400 transition-colors">
         <PaperCard
           paper={data.paper}
-          onFindRelated={data.onFindRelated}
+          onFindRelatedAction={data.onFindRelatedAction}
           isSaved={data.isSaved}
-          onAddToReadlist={data.onAddToReadList}
-          readlists={data.readLists}
+          onAddToReadListAction={data.onAddToReadListAction}
+          readLists={data.readLists}
         />
       </div>
       <Handle

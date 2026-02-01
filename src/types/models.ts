@@ -19,20 +19,3 @@ export interface ReadingList {
   createdAt: number;
   color?: string;
 }
-
-export interface SearchState {
-  isLoading: boolean;
-  results: Paper[];
-  error: string | null;
-  query: string;
-  rawResponse?: string;
-}
-
-export type ViewMode = 'search' | 'readlist';
-
-export interface GroundingChunk {
-  web?: {
-    uri: string;
-    title: string;
-  };
-}

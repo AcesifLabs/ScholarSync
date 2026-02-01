@@ -2,12 +2,7 @@ import React from 'react';
 import { BookOpen, ExternalLink } from 'lucide-react';
 import { Skeleton } from '../Skeleton';
 
-interface PdfDisplayProps {
-    isPdf: boolean | null;
-    pdfUrl: string;
-    title: string;
-    verifyingPdf: boolean;
-}
+import { PdfDisplayProps } from '@/types';
 
 export const PdfDisplay: React.FC<PdfDisplayProps> = ({
     isPdf,

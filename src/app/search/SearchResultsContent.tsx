@@ -10,6 +10,7 @@ import { PaperCardSkeleton } from '@/components/Skeleton';
 import { SearchBar } from '@/components/SearchBar';
 import { MainLayout } from '@/components/MainLayout';
 import { Paper } from '@/types';
+import { UI_TEXT } from '@/constants/appText';
 
 export function SearchResultsContent({ initialResults, query, isLoading = false }: { initialResults?: Paper[], query?: string, isLoading?: boolean }) {
     const router = useRouter();
@@ -21,8 +22,6 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
     const mainScrollRef = useRef<HTMLDivElement>(null);
 
     // Track whether we're still waiting for initial results from the server
-    // This is true when we have a query param and haven't loaded results yet
-    // Also consider server-side loading state
     const [initialLoad, setInitialLoad] = useState<boolean>(isLoading || !initialResults || initialResults.length === 0);
 
     const {
@@ -51,30 +50,24 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
 
     const isSyncing = queryParam && queryParam !== activeQuery;
 
-    // Clear initial load state when we have results, an error, or no query
-    // Don't clear if we're still loading
     useEffect(() => {
         if (!queryParam) {
             setInitialLoad(false);
             return;
         }
 
-        // Only clear initial load if we finished loading
         if (!searchState.isLoading && !isSyncing) {
             setInitialLoad(false);
         }
     }, [queryParam, searchState.isLoading, isSyncing]);
 
     useEffect(() => {
-        // Wait for hydration before syncing lists to avoid creating duplicates or losing active list
-        // Also don't sync if we've cleared the search query (to avoid re-searching the previous term)
         if (isSyncing && isHydrated && searchState.query !== '') {
             handleSearch(queryParam);
             
-            // Find the list to rename - either the specific active list or the default one if no active list is set
             const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
             
-            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
                 handleRenameReadList(listToRename.id, queryParam);
             } else {
                 handleCreateReadList(queryParam);
@@ -106,10 +99,9 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         e?.preventDefault();
         const trimmedQuery = searchState.query.trim();
         if (trimmedQuery) {
-            // Find the list to rename - either the specific active list or the default one if no active list is set
             const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
             
-            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
                 handleRenameReadList(listToRename.id, trimmedQuery);
             } else {
                 handleCreateReadList(trimmedQuery);
@@ -118,8 +110,8 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         }
     };
 
-    const handleStartNewReadlist = () => {
-        handleCreateReadList('Untitled Read List');
+    const handleStartNewReadList = () => {
+        handleCreateReadList(UI_TEXT.UNTITLED_READ_LIST);
         clearSearch();
         router.push('/');
         setTimeout(() => document.getElementById('search-input')?.focus(), 0);
@@ -141,19 +133,19 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
             handleUpdateReadListColor={handleUpdateReadListColor}
             savedPapers={savedPapers}
             handleRemoveFromReadList={handleRemoveFromReadList}
-            onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
-            onViewPaper={(p) => router.push(`/paper/${p.id}`)}
+            onFindRelatedAction={(p: Paper) => router.push(`/related-papers?paperId=${p.id}`)}
+            onViewPaper={(p: Paper) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
             setSidebarOpen={setSidebarOpen}
             showMobileMenuButton={hasResults || showSkeletons || !!searchState.error}
             scrollRef={mainScrollRef}
-            onStartNewReadList={handleStartNewReadlist}
+            onStartNewReadList={handleStartNewReadList}
         >
             <div className="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 shadow-sm transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
                     <div className="hidden md:flex items-center gap-2 mr-4 cursor-pointer" onClick={() => router.push('/')}>
                         <GraduationCap className="text-scholar-600" size={24} />
-                        <span className="font-bold text-slate-800">ScholarSync</span>
+                        <span className="font-bold text-slate-800">{UI_TEXT.APP_NAME}</span>
                     </div>
                     <SearchBar
                         query={searchState.query}
@@ -185,7 +177,7 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
                     <div className="animate-fadeIn space-y-6">
                         {!showSkeletons && (
                             <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
-                                Results for "{activeQuery}"
+                                {UI_TEXT.RESULTS_FOR(activeQuery)}
                             </h3>
                         )}
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -193,12 +185,12 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
                                 <PaperCard
                                     key={`${paper.id}-${index}`}
                                     paper={paper}
-                                    onAddToReadlist={handleAddToReadList}
-                                    onRemoveFromReadlist={(p) => activeReadListId && handleRemoveFromReadList(activeReadListId, p.id)}
-                                    onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
+                                    onAddToReadListAction={handleAddToReadList}
+                                    onRemoveFromReadList={(p) => activeReadListId && handleRemoveFromReadList(activeReadListId, p.id)}
+                                    onFindRelatedAction={(p) => router.push(`/related-papers?paperId=${p.id}`)}
                                     isSaved={!!savedPapers[paper.id] && !!activeList?.paperIds.includes(paper.id)}
-                                    activeReadlistName={activeList?.name}
-                                    readlists={readLists}
+                                    activeReadListName={activeList?.name}
+                                    readLists={readLists}
                                 />
                             ))}
                         </div>
@@ -212,7 +204,7 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
                                 </div>
                             )}
                             {!searchState.isLoading && !hasMore && hasResults && (
-                                <p className="text-slate-400 text-sm text-center">No more related papers found.</p>
+                                <p className="text-slate-400 text-sm text-center">{UI_TEXT.NO_MORE_RELATED}</p>
                             )}
                         </div>
                     </div>
@@ -220,12 +212,12 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
 
                 {!showSkeletons && !hasResults && !searchState.error && !initialLoad && (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <p className="text-slate-500 text-lg text-center">No results found for "{queryParam}"</p>
+                        <p className="text-slate-500 text-lg text-center">{UI_TEXT.NO_RESULTS_FOUND(queryParam)}</p>
                         <button
                             onClick={() => router.push('/')}
                             className="mt-4 text-scholar-600 font-medium hover:underline"
                         >
-                            Back to Home
+                            {UI_TEXT.BACK_TO_HOME}
                         </button>
                     </div>
                 )}

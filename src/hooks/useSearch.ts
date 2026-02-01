@@ -1,8 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLazySearchPapersQuery } from '@/services/paperApi';
-import { SearchState, Paper } from '@/types';
+import { SearchState, Paper, UseSearchReturn } from '@/types';
+import { STORAGE_KEYS } from '@/constants/appText';
 
-export const useSearch = (initialResults?: Paper[], initialQuery?: string) => {
+export const useSearch = (initialResults?: Paper[], initialQuery?: string): UseSearchReturn => {
     const [trigger] = useLazySearchPapersQuery();
 
     const [searchState, setSearchState] = useState<SearchState>({
@@ -30,16 +31,16 @@ export const useSearch = (initialResults?: Paper[], initialQuery?: string) => {
                 setPage(1);
                 setHasMore(true);
             } else {
-                const savedState = localStorage.getItem('scholar_search_state');
+                const savedState = localStorage.getItem(STORAGE_KEYS.SEARCH_STATE);
                 if (savedState) setSearchState(JSON.parse(savedState));
 
-                const savedQuery = localStorage.getItem('scholar_active_query');
+                const savedQuery = localStorage.getItem(STORAGE_KEYS.ACTIVE_QUERY);
                 if (savedQuery) setActiveQuery(savedQuery);
 
-                const savedPage = localStorage.getItem('scholar_page');
+                const savedPage = localStorage.getItem(STORAGE_KEYS.PAGE);
                 if (savedPage) setPage(parseInt(savedPage, 10));
 
-                const savedHasMore = localStorage.getItem('scholar_has_more');
+                const savedHasMore = localStorage.getItem(STORAGE_KEYS.HAS_MORE);
                 if (savedHasMore !== null) setHasMore(JSON.parse(savedHasMore));
             }
         }
@@ -48,19 +49,19 @@ export const useSearch = (initialResults?: Paper[], initialQuery?: string) => {
     const lastRequestTime = useRef<number>(0);
 
     useEffect(() => {
-        localStorage.setItem('scholar_search_state', JSON.stringify({ ...searchState, isLoading: false }));
+        localStorage.setItem(STORAGE_KEYS.SEARCH_STATE, JSON.stringify({ ...searchState, isLoading: false }));
     }, [searchState]);
 
     useEffect(() => {
-        localStorage.setItem('scholar_active_query', activeQuery);
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_QUERY, activeQuery);
     }, [activeQuery]);
 
     useEffect(() => {
-        localStorage.setItem('scholar_page', page.toString());
+        localStorage.setItem(STORAGE_KEYS.PAGE, page.toString());
     }, [page]);
 
     useEffect(() => {
-        localStorage.setItem('scholar_has_more', JSON.stringify(hasMore));
+        localStorage.setItem(STORAGE_KEYS.HAS_MORE, JSON.stringify(hasMore));
     }, [hasMore]);
 
     const handleSearch = useCallback(async (query: string) => {

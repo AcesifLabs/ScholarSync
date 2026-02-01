@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { GraduationCap } from 'lucide-react';
-import { useSearch } from '../hooks/useSearch';
-import { useReadLists } from '../hooks/useReadLists';
-
-import { SearchBar } from '../components/SearchBar';
-import { ReadListDetail } from '../components/ReadListDetail';
-import { MainLayout } from '../components/MainLayout';
+import { useSearch } from '@/hooks/useSearch';
+import { useReadLists } from '@/hooks/useReadLists';
+import { SearchBar } from '@/components/SearchBar';
+import { ReadListDetail } from '@/components/ReadListDetail';
+import { MainLayout } from '@/components/MainLayout';
+import { UI_TEXT } from '@/constants/appText';
 
 export default function Home() {
     const router = useRouter();
@@ -40,7 +40,7 @@ export default function Home() {
             <div className="flex-1 flex flex-col items-center justify-center py-10 md:py-20 text-center space-y-6 max-w-7xl mx-auto px-4 w-full">
                 <div className="flex items-center gap-2 mb-4">
                     <GraduationCap size={56} className="text-scholar-600" />
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">ScholarSync</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">{UI_TEXT.APP_NAME}</h1>
                 </div>
                 <SearchBar
                     query={searchState.query}
@@ -51,8 +51,8 @@ export default function Home() {
                         if (trimmedQuery) {
                             // Find the list to rename - either the specific active list or the default one if no active list is set
                             const listToRename = activeList || readLists.find(l => l.id === 'default');
-                            
-                            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+
+                            if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
                                 handleRenameReadList(listToRename.id, trimmedQuery);
                             }
                             router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
@@ -61,14 +61,14 @@ export default function Home() {
                     isLoading={searchState.isLoading}
                 />
                 <p className="mt-4 text-sm text-slate-500">
-                    Find <span className="font-semibold text-scholar-600">Open Access</span> research papers & create your personal library.
+                    Find <span className="font-semibold text-scholar-600">{UI_TEXT.OPEN_ACCESS}</span> research papers & create your personal library.
                 </p>
             </div>
         );
     };
 
     const handleStartNewReadlist = () => {
-        handleCreateReadList('Untitled Read List');
+        handleCreateReadList(UI_TEXT.UNTITLED_READ_LIST);
         clearSearch();
         router.push('/');
         // Focus search bar
@@ -86,7 +86,7 @@ export default function Home() {
             handleUpdateReadListColor={handleUpdateReadListColor}
             savedPapers={savedPapers}
             handleRemoveFromReadList={handleRemoveFromReadList}
-            onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
+            onFindRelatedAction={(p) => router.push(`/related-papers?paperId=${p.id}`)}
             onViewPaper={(p) => router.push(`/paper/${p.id}`)}
             isSidebarOpen={isSidebarOpen}
             setSidebarOpen={setSidebarOpen}
@@ -98,7 +98,7 @@ export default function Home() {
                 <ReadListDetail
                     readList={activeList}
                     savedPapers={savedPapers}
-                    onFindRelated={(p) => router.push(`/related-papers?paperId=${p.id}`)}
+                    onFindRelatedAction={(p) => router.push(`/related-papers?paperId=${p.id}`)}
                     onRemoveFromReadList={(p) => handleRemoveFromReadList(activeList.id, p.id)}
                     readLists={readLists}
                     onBackToSearch={() => {

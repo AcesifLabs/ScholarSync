@@ -1,14 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { ReadingList } from '@/types';
+import React from 'react';
 import { ChevronRight } from 'lucide-react';
-
-interface ContextMenuProps {
-    isOpen: boolean;
-    position: { x: number; y: number };
-    onClose: () => void;
-    readLists: ReadingList[];
-    onSelectReadList: (readListId: string) => void;
-}
+import { ContextMenuProps } from '@/types';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
     isOpen,
@@ -17,23 +10,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     readLists,
     onSelectReadList
 }) => {
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen, onClose]);
+    const menuRef = useClickOutside<HTMLDivElement>(onClose, isOpen);
 
     if (!isOpen) return null;
 

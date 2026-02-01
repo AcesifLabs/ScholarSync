@@ -1,13 +1,7 @@
 import React from 'react';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 
-interface ViewerHeaderProps {
-    title: string;
-    authors: string[];
-    year: string;
-    pdfUrl: string;
-    onBack: () => void;
-}
+import { ViewerHeaderProps } from '@/types';
 
 export const ViewerHeader: React.FC<ViewerHeaderProps> = ({ title, authors, year, pdfUrl, onBack }) => {
     return (

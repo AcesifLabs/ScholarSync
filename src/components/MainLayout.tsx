@@ -1,27 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Menu, GraduationCap } from 'lucide-react';
 import { ReadListSidebar } from './ReadListSidebar';
-import { Paper, ReadingList } from '@/types';
-
-interface MainLayoutProps {
-    children: React.ReactNode;
-    readLists: ReadingList[];
-    activeReadListId: string | null;
-    setActiveReadListId: (id: string | null) => void;
-    handleCreateReadList: (name: string) => void;
-    handleDeleteReadList: (id: string) => void;
-    handleRenameReadList: (id: string, name: string) => void;
-    handleUpdateReadListColor: (id: string, color: string) => void;
-    savedPapers: Record<string, Paper>;
-    handleRemoveFromReadList: (listId: string, paperId: string) => void;
-    onFindRelated?: (paper: Paper) => void;
-    onViewPaper?: (paper: Paper) => void;
-    isSidebarOpen: boolean;
-    setSidebarOpen: (open: boolean) => void;
-    showMobileMenuButton?: boolean;
-    scrollRef?: React.RefObject<HTMLDivElement | null>;
-    onStartNewReadList: () => void;
-}
+import { MainLayoutProps } from '@/types';
+import { UI_TEXT } from '@/constants/appText';
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
     children,
@@ -34,7 +17,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     handleUpdateReadListColor,
     savedPapers,
     handleRemoveFromReadList,
-    onFindRelated,
+    onFindRelatedAction,
     onViewPaper,
     isSidebarOpen,
     setSidebarOpen,
@@ -59,7 +42,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                 onUpdateReadListColor={handleUpdateReadListColor}
                 savedPapers={savedPapers}
                 onRemovePaper={handleRemoveFromReadList}
-                onFindRelated={onFindRelated}
+                onFindRelatedAction={onFindRelatedAction}
                 onViewPaper={onViewPaper}
                 isOpen={isSidebarOpen}
                 onClose={() => setSidebarOpen(false)}
@@ -76,7 +59,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     <header className="bg-white border-b border-slate-200 p-4 flex items-center justify-between md:hidden z-30 shrink-0">
                         <div className="flex items-center gap-2">
                             <GraduationCap className="text-scholar-600" />
-                            <span className="font-bold text-slate-800">ScholarSync</span>
+                            <span className="font-bold text-slate-800">{UI_TEXT.APP_NAME}</span>
                         </div>
                         <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-md">
                             <Menu size={24} />

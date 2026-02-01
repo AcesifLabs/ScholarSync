@@ -1,15 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Edit2, Palette, ChevronRight, Trash2 } from 'lucide-react';
 
-interface ReadListContextMenuProps {
-    isOpen: boolean;
-    position: { x: number; y: number };
-    onClose: () => void;
-    onRename: () => void;
-    onSetColor: (color: string) => void;
-    onDelete: () => void;
-    canDelete: boolean;
-}
+import { ReadListContextMenuProps } from '@/types';
+import { UI_TEXT } from '@/constants/appText';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 const PRESET_COLORS = [
     '#f87171', // red-400
@@ -41,23 +35,7 @@ export const ReadListContextMenu: React.FC<ReadListContextMenuProps> = ({
     onDelete,
     canDelete
 }) => {
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen, onClose]);
+    const menuRef = useClickOutside<HTMLDivElement>(onClose, isOpen);
 
     if (!isOpen) return null;
 
@@ -78,14 +56,14 @@ export const ReadListContextMenu: React.FC<ReadListContextMenuProps> = ({
                 className="w-full px-4 py-2.5 text-sm text-left text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors"
             >
                 <Edit2 size={16} className="text-slate-400" />
-                <span>Rename List</span>
+                <span>{UI_TEXT.RENAME_LIST}</span>
             </button>
 
             <div className="relative group">
                 <button className="w-full px-4 py-2.5 text-sm text-left text-slate-700 hover:bg-slate-50 flex items-center justify-between group transition-colors">
                     <div className="flex items-center gap-3">
                         <Palette size={16} className="text-slate-400" />
-                        <span>Change Color</span>
+                        <span>{UI_TEXT.CHANGE_COLOR}</span>
                     </div>
                     <ChevronRight size={14} className="text-slate-400" />
                 </button>
@@ -114,7 +92,7 @@ export const ReadListContextMenu: React.FC<ReadListContextMenuProps> = ({
                                 onClose();
                             }}
                             className="w-6 h-6 rounded-full border border-slate-200 hover:scale-110 transition-transform flex items-center justify-center bg-white"
-                            title="Default Color"
+                            title={UI_TEXT.DEFAULT_COLOR}
                         >
                             <div className="w-full h-px bg-red-400 rotate-45" />
                         </button>
@@ -133,7 +111,7 @@ export const ReadListContextMenu: React.FC<ReadListContextMenuProps> = ({
                         className="w-full px-4 py-2.5 text-sm text-left text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                     >
                         <Trash2 size={16} className="text-red-400" />
-                        <span>Delete List</span>
+                        <span>{UI_TEXT.DELETE_LIST}</span>
                     </button>
                 </>
             )}

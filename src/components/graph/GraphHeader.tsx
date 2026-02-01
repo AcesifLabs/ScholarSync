@@ -1,10 +1,7 @@
 import React from 'react';
 import { ArrowLeft, GraduationCap } from 'lucide-react';
-
-interface GraphHeaderProps {
-    nodeCount: number;
-    onBack: () => void;
-}
+import { GraphHeaderProps } from '@/types';
+import { UI_TEXT } from '@/constants/appText';
 
 export const GraphHeader: React.FC<GraphHeaderProps> = ({ nodeCount, onBack }) => {
     return (
@@ -13,13 +10,13 @@ export const GraphHeader: React.FC<GraphHeaderProps> = ({ nodeCount, onBack }) =
                 <button
                     onClick={onBack}
                     className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
-                    title="Back to Search"
+                    title={UI_TEXT.BACK_TO_SEARCH}
                 >
                     <ArrowLeft size={20} />
                 </button>
                 <div className="flex items-center gap-2">
                     <GraduationCap className="text-scholar-600" size={28} />
-                    <h1 className="text-xl font-bold text-slate-800 tracking-tight">Research Graph</h1>
+                    <h1 className="text-xl font-bold text-slate-800 tracking-tight">{UI_TEXT.RESEARCH_GRAPH}</h1>
                 </div>
             </div>
             <div className="flex items-center gap-6">

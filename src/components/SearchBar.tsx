@@ -1,14 +1,8 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-interface SearchBarProps {
-    query: string;
-    onChange: (value: string) => void;
-    onSearch: (e?: React.FormEvent) => void;
-    isLoading: boolean;
-    isSticky?: boolean;
-    isPagination?: boolean;
-}
+import { SearchBarProps } from '@/types';
+import { UI_TEXT } from '@/constants/appText';
 
 export const SearchBar: React.FC<SearchBarProps> = ({
     query,
@@ -30,7 +24,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     value={query}
                     onChange={(e) => onChange(e.target.value)}
                     className={`block w-full pl-11 pr-4 ${isSticky ? 'py-3 text-base' : 'py-4 text-lg'} bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-scholar-500/20 focus:border-scholar-500 transition-all`}
-                    placeholder="Search for topics..."
+                    placeholder={UI_TEXT.SEARCH_PLACEHOLDER}
                 />
                 <button
                     type="submit"

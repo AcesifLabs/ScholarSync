@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Paper } from "@/types";
 import { cleanJsonString } from "@/lib/paperServiceUtils";
 import { searchPapersAction, getPaperByIdAction, getRelatedPapersAction } from './paperActions';
+import { AI_PROMPTS } from '@/constants/appText';
 
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY!;
 
@@ -11,19 +12,7 @@ const client = new GoogleGenAI({ apiKey: GEMINI_API_KEY! });
 const searchWithGemini = async (query: string): Promise<Paper[]> => {
     if (!client) throw new Error("GEMINI_API_KEY is not configured");
 
-    const prompt = `Find 12 real, high-quality academic research papers related to the topic: "${query}".
-    You must return a valid JSON array of objects.
-    Each object must have exactly these fields:
-    - id: string (unique)
-    - title: string
-    - authors: string[]
-    - abstract: string (comprehensive summary)
-    - year: string
-    - source: string (the journal, conference, or publisher name)
-    - pdfUrl: string (a valid URL to the paper or its landing page)
-    - isOpenAccess: boolean
-    
-    Ensure the papers are real and citations are accurate.`;
+    const prompt = AI_PROMPTS.SEARCH_PAPERS(query);
 
     const response = await client.models.generateContent({
         model: 'gemini-2.0-flash',
@@ -31,8 +20,8 @@ const searchWithGemini = async (query: string): Promise<Paper[]> => {
     });
 
     const text = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    const papers = JSON.parse(cleanJsonString(text));
-    return papers.map((p: any) => ({
+    const papers = JSON.parse(cleanJsonString(text)) as Paper[];
+    return papers.map((p: Paper) => ({
         ...p,
         source: p.source ? `${p.source} (via Gemini)` : "Gemini AI"
     }));
@@ -41,22 +30,7 @@ const searchWithGemini = async (query: string): Promise<Paper[]> => {
 const recommendWithGemini = async (paper: Paper): Promise<Paper[]> => {
     if (!client) throw new Error("GEMINI_API_KEY is not configured");
 
-    const prompt = `Recommend 6 academic research papers similar or highly relevant to this paper:
-    Title: "${paper.title}"
-    Authors: ${paper.authors.join(', ')}
-    Abstract: ${paper.abstract.substring(0, 500)}...
-    
-    You must return a valid JSON array of objects.
-    Each object must have exactly these fields:
-    - id: string (use a prefix like 'gem-rec-' followed by a unique string)
-    - title: string
-    - authors: string[]
-    - abstract: string
-    - year: string
-    - source: string
-    - pdfUrl: string
-    - isOpenAccess: boolean
-    - relatedReason: string (one concise sentence explaining why this is relevant to the original paper)`;
+    const prompt = AI_PROMPTS.RECOMMEND_PAPERS(paper.title, paper.authors.join(', '), paper.abstract);
 
     const response = await client.models.generateContent({
         model: 'gemini-2.0-flash',
@@ -80,8 +54,8 @@ export const paperApi = createApi({
                     try {
                         const papers = await searchWithGemini(query);
                         return { data: { papers } };
-                    } catch (err) {
-                        return { error: result.error };
+                    } catch {
+                        return { error: { status: 'CUSTOM_ERROR', error: result.error.message, data: null } };
                     }
                 }
 
@@ -112,7 +86,7 @@ export const paperApi = createApi({
         getPaperById: builder.query<Paper, string>({
             queryFn: async (paperId) => {
                 const result = await getPaperByIdAction(paperId);
-                if (result.error) return { error: result.error };
+                if (result.error) return { error: { status: 'CUSTOM_ERROR', error: result.error.message, data: null } };
                 return { data: result.data as Paper };
             },
         }),

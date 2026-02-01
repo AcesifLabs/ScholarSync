@@ -5,15 +5,15 @@ import {
     MarkerType,
     Edge
 } from '@xyflow/react';
-import { useLazyGetPaperByIdQuery, useLazyGetRelatedPapersQuery } from '../services/paperApi';
-import { Paper, ReadingList } from '../types';
-import { PaperNodeType } from '../components/PaperNode';
+import { useLazyGetPaperByIdQuery, useLazyGetRelatedPapersQuery } from '@/services/paperApi';
+import { Paper, ReadingList, PaperNodeType } from '@/types';
+import { ERROR_MESSAGES } from '@/constants/appText';
 
 export const useRelatedPapersGraph = (
     paperId: string | null,
     savedPapers: Record<string, Paper>,
-    handleAddToReadlist: (paper: Paper, targetListId?: string) => void,
-    readlists: ReadingList[]
+    handleAddToReadList: (paper: Paper, targetListId?: string) => void,
+    readLists: ReadingList[]
 ) => {
     const [nodes, setNodes, onNodesChange] = useNodesState<PaperNodeType>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -21,9 +21,9 @@ export const useRelatedPapersGraph = (
     const [triggerGetPaper] = useLazyGetPaperByIdQuery();
     const [triggerGetRelated] = useLazyGetRelatedPapersQuery();
 
-    const onFindRelatedRef = useRef<(paper: Paper) => Promise<void>>(async () => { });
+    const onFindRelatedActionRef = useRef<(paper: Paper) => Promise<void>>(async () => { });
 
-    const onFindRelated = useCallback(async (paper: Paper) => {
+    const onFindRelatedAction = useCallback(async (paper: Paper) => {
         try {
             const related = await triggerGetRelated(paper).unwrap();
 
@@ -56,10 +56,10 @@ export const useRelatedPapersGraph = (
                         type: 'paper',
                         data: {
                             paper: p,
-                            onFindRelated: (p) => onFindRelatedRef.current(p),
+                            onFindRelatedAction: (p: Paper) => onFindRelatedActionRef.current(p),
                             isSaved: !!savedPapers[p.id],
-                            onAddToReadList: handleAddToReadlist,
-                            readLists: readlists
+                            onAddToReadListAction: handleAddToReadList,
+                            readLists: readLists
                         },
                         position: { x, y },
                     });
@@ -77,13 +77,13 @@ export const useRelatedPapersGraph = (
                 return nds.concat(newNodes);
             });
         } catch (err) {
-            console.error("Failed to expand graph:", err);
+            console.error(ERROR_MESSAGES.GRAPH_EXPAND_FAILED, err);
         }
-    }, [setNodes, setEdges, savedPapers, handleAddToReadlist, triggerGetRelated]);
+    }, [setNodes, setEdges, savedPapers, handleAddToReadList, triggerGetRelated, readLists]);
 
     useEffect(() => {
-        onFindRelatedRef.current = onFindRelated;
-    }, [onFindRelated]);
+        onFindRelatedActionRef.current = onFindRelatedAction;
+    }, [onFindRelatedAction]);
 
     useEffect(() => {
         if (!paperId) return;
@@ -97,10 +97,10 @@ export const useRelatedPapersGraph = (
                     type: 'paper',
                     data: {
                         paper: rootPaper,
-                        onFindRelated,
+                        onFindRelatedAction,
                         isSaved: !!savedPapers[rootPaper.id],
-                        onAddToReadList: handleAddToReadlist,
-                        readLists: readlists
+                        onAddToReadListAction: handleAddToReadList,
+                        readLists: readLists
                     },
                     position: { x: 0, y: 0 },
                 };
@@ -114,10 +114,10 @@ export const useRelatedPapersGraph = (
                         type: 'paper',
                         data: {
                             paper: p,
-                            onFindRelated,
+                            onFindRelatedAction,
                             isSaved: !!savedPapers[p.id],
-                            onAddToReadlist: handleAddToReadlist,
-                            readlists
+                            onAddToReadListAction: handleAddToReadList,
+                            readLists: readLists
                         },
                         position: { x: radius * Math.cos(angle), y: radius * Math.sin(angle) },
                     };
@@ -134,12 +134,12 @@ export const useRelatedPapersGraph = (
                 setNodes([initialNode, ...firstLevelNodes]);
                 setEdges(firstLevelEdges);
             } catch (err) {
-                console.error("Failed to initialize graph:", err);
+                console.error(ERROR_MESSAGES.GRAPH_INIT_FAILED, err);
             }
         };
 
         initGraph();
-    }, [paperId, onFindRelated, handleAddToReadlist, savedPapers, setNodes, setEdges, triggerGetPaper, triggerGetRelated]);
+    }, [paperId, onFindRelatedAction, handleAddToReadList, savedPapers, setNodes, setEdges, triggerGetPaper, triggerGetRelated, readLists]);
 
     return {
         nodes,
