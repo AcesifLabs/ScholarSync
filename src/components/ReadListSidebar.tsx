@@ -66,16 +66,18 @@ export const ReadListSidebar: React.FC<ReadListSidebarProps> = ({
                 </span>
               </div>
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setListIdToDelete(list.id);
-                }}
-                className={`text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1 ${activeReadListId === list.id ? 'opacity-100' : ''}`}
-                title="Delete List"
-              >
-                <Trash2 size={14} />
-              </button>
+              {list.id !== 'default' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setListIdToDelete(list.id);
+                  }}
+                  className={`text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1 ${activeReadListId === list.id ? 'opacity-100' : ''}`}
+                  title="Delete List"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
           ))}
 

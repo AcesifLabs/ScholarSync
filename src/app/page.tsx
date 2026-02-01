@@ -27,6 +27,7 @@ export default function Home() {
         activeReadListId,
         setActiveReadListId,
         handleCreateReadList,
+        handleRenameReadList,
         handleDeleteReadList,
         handleRemoveFromReadList
     } = useReadLists();
@@ -47,7 +48,12 @@ export default function Home() {
                         e?.preventDefault();
                         const trimmedQuery = searchState.query.trim();
                         if (trimmedQuery) {
-                            handleCreateReadList(trimmedQuery);
+                            // Find the list to rename - either the specific active list or the default one if no active list is set
+                            const listToRename = activeList || readLists.find(l => l.id === 'default');
+                            
+                            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+                                handleRenameReadList(listToRename.id, trimmedQuery);
+                            }
                             router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
                         }
                     }}
@@ -61,7 +67,7 @@ export default function Home() {
     };
 
     const handleStartNewReadlist = () => {
-        setActiveReadListId(null);
+        handleCreateReadList('Untitled Read List');
         clearSearch();
         router.push('/');
         // Focus search bar
@@ -79,11 +85,11 @@ export default function Home() {
             handleRemoveFromReadList={handleRemoveFromReadList}
             isSidebarOpen={isSidebarOpen}
             setSidebarOpen={setSidebarOpen}
-            showMobileMenuButton={!activeReadListId}
+            showMobileMenuButton={true}
             scrollRef={mainScrollRef}
             onStartNewReadList={handleStartNewReadlist}
         >
-            {activeReadListId && activeList ? (
+            {activeReadListId && activeList && activeList.paperIds.length > 0 ? (
                 <ReadListDetail
                     readList={activeList}
                     savedPapers={savedPapers}
@@ -96,7 +102,22 @@ export default function Home() {
                     }}
                 />
             ) : (
-                renderSearchContent()
+                <div className="flex flex-col h-full">
+                    {activeList && activeList.paperIds.length === 0 && (
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 w-full">
+                            <div className="bg-scholar-50 border border-scholar-100 rounded-xl p-4 flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-lg font-bold text-scholar-900">{activeList.name}</h2>
+                                    <p className="text-sm text-scholar-700">This list is currently empty. Use the search below to add papers.</p>
+                                </div>
+                                <div className="hidden sm:block">
+                                    <span className="text-xs font-semibold text-scholar-600 uppercase tracking-wider">New List</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {renderSearchContent()}
+                </div>
             )}
         </MainLayout>
     );

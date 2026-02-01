@@ -4,7 +4,7 @@ import { extractArxivPdfUrl } from "@/lib/paperServiceUtils";
 
 const SEMANTIC_SCHOLAR_API_KEY = process.env.NEXT_PUBLIC_SEMANTIC_SCHOLAR_API_KEY!;
 
-async function makeRequest(url: string, useKey: boolean): Promise<any | null> {
+async function makeRequest(url: string, useKey: boolean, retries = 5, backoff = 1000): Promise<any | null> {
     const headers: Record<string, string> = {
         'User-Agent': 'ScholarSync/1.0',
         'Accept': 'application/json',
@@ -22,12 +22,19 @@ async function makeRequest(url: string, useKey: boolean): Promise<any | null> {
         });
 
         if (!response.ok) {
+            // Handle 429 Too Many Requests with exponential backoff
+            if (response.status === 429 && retries > 0) {
+                console.warn(`[SSR Fetch] 429 Too Many Requests, retrying in ${backoff}ms... (${retries} retries left)`);
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                return makeRequest(url, useKey, retries - 1, backoff * 2);
+            }
+
             const errorBody = await response.json().catch(() => ({}));
             console.error(`[SSR Fetch] Error (useKey=${useKey}, url=${url}): ${response.status} ${response.statusText}`, JSON.stringify(errorBody));
 
             if (useKey && response.status === 403) {
                 console.warn("[SSR Fetch] 403 Forbidden with API key, falling back to public tier (no key)");
-                return makeRequest(url, false);
+                return makeRequest(url, false, retries, backoff);
             }
 
             return null;
@@ -35,6 +42,11 @@ async function makeRequest(url: string, useKey: boolean): Promise<any | null> {
 
         return response.json();
     } catch (error) {
+        if (retries > 0) {
+            console.warn(`[SSR Fetch] Exception, retrying in ${backoff}ms... (${retries} retries left)`, error);
+            await new Promise(resolve => setTimeout(resolve, backoff));
+            return makeRequest(url, useKey, retries - 1, backoff * 2);
+        }
         console.error(`[SSR Fetch] Exception (useKey=${useKey}, url=${url}):`, error);
         return null;
     }

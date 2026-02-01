@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Paper, ReadingList } from '@/types';
 
 export const useReadLists = () => {
-    const [readLists, setReadLists] = useState<ReadingList[]>([{ id: 'default', name: 'My Papers', paperIds: [], createdAt: Date.now() }]);
+    const [readLists, setReadLists] = useState<ReadingList[]>([{ id: 'default', name: 'Untitled Read List', paperIds: [], createdAt: Date.now() }]);
 
     const [savedPapers, setSavedPapers] = useState<Record<string, Paper>>({});
 
     const [activeReadListId, setActiveReadListId] = useState<string | null>(null);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -18,24 +19,32 @@ export const useReadLists = () => {
 
             const savedActiveId = localStorage.getItem('scholar_active_list_id');
             if (savedActiveId) setActiveReadListId(savedActiveId);
+            
+            setIsHydrated(true);
         }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('scholar_readlists', JSON.stringify(readLists));
-    }, [readLists]);
-
-    useEffect(() => {
-        localStorage.setItem('scholar_papers', JSON.stringify(savedPapers));
-    }, [savedPapers]);
-
-    useEffect(() => {
-        if (activeReadListId) {
-            localStorage.setItem('scholar_active_list_id', activeReadListId);
-        } else {
-            localStorage.removeItem('scholar_active_list_id');
+        if (isHydrated) {
+            localStorage.setItem('scholar_readlists', JSON.stringify(readLists));
         }
-    }, [activeReadListId]);
+    }, [readLists, isHydrated]);
+
+    useEffect(() => {
+        if (isHydrated) {
+            localStorage.setItem('scholar_papers', JSON.stringify(savedPapers));
+        }
+    }, [savedPapers, isHydrated]);
+
+    useEffect(() => {
+        if (isHydrated) {
+            if (activeReadListId) {
+                localStorage.setItem('scholar_active_list_id', activeReadListId);
+            } else {
+                localStorage.removeItem('scholar_active_list_id');
+            }
+        }
+    }, [activeReadListId, isHydrated]);
 
     const handleCreateReadlist = useCallback((name: string) => {
         const trimmedName = name.trim();
@@ -57,7 +66,14 @@ export const useReadLists = () => {
         setActiveReadListId(newList.id);
     }, [readLists]);
 
+    const handleRenameReadList = useCallback((id: string, newName: string) => {
+        setReadLists(prev => prev.map(list => 
+            list.id === id ? { ...list, name: newName } : list
+        ));
+    }, []);
+
     const handleDeleteReadlist = useCallback((id: string) => {
+        if (id === 'default') return; // Prevent deleting the default list
         setReadLists(prev => prev.filter(l => l.id !== id));
         if (activeReadListId === id) setActiveReadListId(null);
     }, [activeReadListId]);
@@ -94,8 +110,10 @@ export const useReadLists = () => {
         activeReadListId: activeReadListId,
         setActiveReadListId: setActiveReadListId,
         handleCreateReadList: handleCreateReadlist,
+        handleRenameReadList,
         handleDeleteReadList: handleDeleteReadlist,
         handleAddToReadList: handleAddToReadlist,
-        handleRemoveFromReadList: handleRemoveFromReadlist
+        handleRemoveFromReadList: handleRemoveFromReadlist,
+        isHydrated
     };
 };

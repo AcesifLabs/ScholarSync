@@ -11,7 +11,7 @@ import { SearchBar } from '@/components/SearchBar';
 import { MainLayout } from '@/components/MainLayout';
 import { Paper } from '@/types';
 
-export function SearchResultsContent({ initialResults, query }: { initialResults?: Paper[], query?: string }) {
+export function SearchResultsContent({ initialResults, query, isLoading = false }: { initialResults?: Paper[], query?: string, isLoading?: boolean }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const queryParam = searchParams.get('q') || '';
@@ -19,6 +19,11 @@ export function SearchResultsContent({ initialResults, query }: { initialResults
     const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
     const observerTarget = useRef<HTMLDivElement>(null);
     const mainScrollRef = useRef<HTMLDivElement>(null);
+
+    // Track whether we're still waiting for initial results from the server
+    // This is true when we have a query param and haven't loaded results yet
+    // Also consider server-side loading state
+    const [initialLoad, setInitialLoad] = useState<boolean>(isLoading || !initialResults || initialResults.length === 0);
 
     const {
         searchState,
@@ -36,21 +41,47 @@ export function SearchResultsContent({ initialResults, query }: { initialResults
         activeReadListId,
         setActiveReadListId,
         handleCreateReadList,
+        handleRenameReadList,
         handleDeleteReadList,
         handleAddToReadList,
-        handleRemoveFromReadList
+        handleRemoveFromReadList,
+        isHydrated
     } = useReadLists();
 
     const isSyncing = queryParam && queryParam !== activeQuery;
 
+    // Clear initial load state when we have results, an error, or no query
+    // Don't clear if we're still loading
     useEffect(() => {
-        if (isSyncing) {
-            handleSearch(queryParam);
-            handleCreateReadList(queryParam);
+        if (!queryParam) {
+            setInitialLoad(false);
+            return;
         }
-    }, [queryParam, activeQuery, handleSearch, handleCreateReadList, isSyncing]);
 
-    const showSkeletons = (searchState.isLoading && searchState.results.length === 0) || isSyncing;
+        // Only clear initial load if we finished loading
+        if (!searchState.isLoading && !isSyncing) {
+            setInitialLoad(false);
+        }
+    }, [queryParam, searchState.isLoading, isSyncing]);
+
+    useEffect(() => {
+        // Wait for hydration before syncing lists to avoid creating duplicates or losing active list
+        // Also don't sync if we've cleared the search query (to avoid re-searching the previous term)
+        if (isSyncing && isHydrated && searchState.query !== '') {
+            handleSearch(queryParam);
+            
+            // Find the list to rename - either the specific active list or the default one if no active list is set
+            const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
+            
+            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+                handleRenameReadList(listToRename.id, queryParam);
+            } else {
+                handleCreateReadList(queryParam);
+            }
+        }
+    }, [queryParam, activeQuery, handleSearch, handleCreateReadList, handleRenameReadList, isSyncing, activeReadListId, readLists, isHydrated, searchState.query]);
+
+    const showSkeletons = (searchState.isLoading && searchState.results.length === 0) || isSyncing || initialLoad;
     const hasResults = searchState.results.length > 0;
 
     useEffect(() => {
@@ -74,13 +105,20 @@ export function SearchResultsContent({ initialResults, query }: { initialResults
         e?.preventDefault();
         const trimmedQuery = searchState.query.trim();
         if (trimmedQuery) {
-            handleCreateReadList(trimmedQuery);
+            // Find the list to rename - either the specific active list or the default one if no active list is set
+            const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
+            
+            if (listToRename && (listToRename.name === 'Untitled Read List' || listToRename.name === 'Untitled List' || listToRename.name === 'Untitled Reading List')) {
+                handleRenameReadList(listToRename.id, trimmedQuery);
+            } else {
+                handleCreateReadList(trimmedQuery);
+            }
             router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
         }
     };
 
     const handleStartNewReadlist = () => {
-        setActiveReadListId(null);
+        handleCreateReadList('Untitled Read List');
         clearSearch();
         router.push('/');
         setTimeout(() => document.getElementById('search-input')?.focus(), 0);
@@ -92,7 +130,10 @@ export function SearchResultsContent({ initialResults, query }: { initialResults
         <MainLayout
             readLists={readLists}
             activeReadListId={activeReadListId}
-            setActiveReadListId={setActiveReadListId}
+            setActiveReadListId={(id) => {
+                setActiveReadListId(id);
+                if (id) router.push('/');
+            }}
             handleCreateReadList={handleCreateReadList}
             handleDeleteReadList={handleDeleteReadList}
             savedPapers={savedPapers}
@@ -172,7 +213,7 @@ export function SearchResultsContent({ initialResults, query }: { initialResults
                     </div>
                 )}
 
-                {!showSkeletons && !hasResults && !searchState.error && (
+                {!showSkeletons && !hasResults && !searchState.error && !initialLoad && (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
                         <p className="text-slate-500 text-lg text-center">No results found for "{queryParam}"</p>
                         <button
