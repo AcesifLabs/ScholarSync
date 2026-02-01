@@ -14,7 +14,7 @@ async function getSession() {
 }
 
 export async function getReadingLists(): Promise<{ 
-  data?: ReadingList[]; 
+  data?: { lists: ReadingList[], papers: Record<string, Paper> }; 
   error?: string 
 }> {
   try {
@@ -23,8 +23,8 @@ export async function getReadingLists(): Promise<{
       return { error: 'Unauthorized' };
     }
 
-    const lists = await readingListDb.getUserReadingLists(session.user.id);
-    return { data: lists };
+    const result = await readingListDb.getUserReadingLists(session.user.id);
+    return { data: result };
   } catch (error) {
     console.error('Failed to get reading lists:', error);
     return { error: 'Failed to fetch reading lists' };

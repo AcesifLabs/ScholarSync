@@ -15,6 +15,7 @@ export interface UseReadListsReturn {
     handleRemoveFromReadList: (listId: string, paperId: string) => void;
     isHydrated: boolean;
     isLoggedIn: boolean;
+    isAuthLoading: boolean;
 }
 
 export interface UseSearchReturn {

@@ -2,7 +2,8 @@
 import { prisma } from '@/lib/prisma';
 import { Paper, ReadingList } from '@/types';
 
-export async function getUserReadingLists(userId: string): Promise<ReadingList[]> {
+export async function getUserReadingLists(userId: string): Promise<{ lists: ReadingList[], papers: Record<string, Paper> }> {
+  console.log(`[DB] Fetching lists for user ${userId}`);
   const lists = await prisma.readingList.findMany({
     where: { userId },
     include: {
@@ -14,14 +15,37 @@ export async function getUserReadingLists(userId: string): Promise<ReadingList[]
     orderBy: { createdAt: 'desc' }
   });
 
-  return lists.map((list: any) => ({
-    id: list.id,
-    name: list.name,
-    description: list.description || undefined,
-    paperIds: list.papers.map((p: any) => p.paperId),
-    createdAt: list.createdAt.getTime(),
-    color: list.color
-  }));
+  const savedPapers: Record<string, Paper> = {};
+  const formattedLists = lists.map((list: any) => {
+    list.papers.forEach((p: any) => {
+      const paper = p.paper;
+      if (paper) {
+        savedPapers[paper.id] = {
+          id: paper.id,
+          title: paper.title,
+          authors: paper.authors as string[],
+          abstract: paper.abstract || '',
+          year: paper.year?.toString() || 'n.d.',
+          source: paper.source || '',
+          pdfUrl: paper.pdfUrl || '',
+          isOpenAccess: paper.isOpenAccess,
+          openAccessPdf: paper.openAccessPdf as any
+        };
+      }
+    });
+
+    return {
+      id: list.id,
+      name: list.name,
+      description: list.description || undefined,
+      paperIds: list.papers.map((p: any) => p.paperId),
+      createdAt: list.createdAt.getTime(),
+      color: list.color
+    };
+  });
+
+  console.log(`[DB] Found ${formattedLists.length} lists and ${Object.keys(savedPapers).length} papers`);
+  return { lists: formattedLists, papers: savedPapers };
 }
 
 export async function createReadingList(
@@ -51,48 +75,69 @@ export async function addPaperToReadingList(
   listId: string,
   paper: Paper
 ): Promise<void> {
+  console.log(`[DB] Adding paper ${paper.id} to list ${listId} for user ${userId}`);
   // Ensure the list belongs to the user
   const list = await prisma.readingList.findFirst({
     where: { id: listId, userId }
   });
 
-  if (!list) return;
+  if (!list) {
+    console.error(`[DB] List ${listId} not found for user ${userId}`);
+    return;
+  }
 
   // Upsert paper first (cache it)
-  await prisma.paper.upsert({
-    where: { id: paper.id },
-    create: {
-      id: paper.id,
-      title: paper.title,
-      authors: paper.authors,
-      abstract: paper.abstract,
-      year: paper.year ? parseInt(paper.year) : null,
-      source: paper.source,
-      pdfUrl: paper.pdfUrl,
-      isOpenAccess: paper.isOpenAccess,
-      openAccessPdf: paper.openAccessPdf ? JSON.parse(JSON.stringify(paper.openAccessPdf)) : null
-    },
-    update: {
-      title: paper.title,
-      authors: paper.authors,
-      abstract: paper.abstract,
-      year: paper.year ? parseInt(paper.year) : null,
-      source: paper.source,
-      pdfUrl: paper.pdfUrl,
-      isOpenAccess: paper.isOpenAccess,
-      openAccessPdf: paper.openAccessPdf ? JSON.parse(JSON.stringify(paper.openAccessPdf)) : null
-    }
-  });
+  try {
+    await prisma.paper.upsert({
+      where: { id: paper.id },
+      create: {
+        id: paper.id,
+        title: paper.title,
+        authors: paper.authors,
+        abstract: paper.abstract,
+        year: paper.year ? (isNaN(parseInt(paper.year)) ? null : parseInt(paper.year)) : null,
+        source: paper.source,
+        pdfUrl: paper.pdfUrl,
+        isOpenAccess: paper.isOpenAccess,
+        openAccessPdf: paper.openAccessPdf ? JSON.parse(JSON.stringify(paper.openAccessPdf)) : null
+      },
+      update: {
+        title: paper.title,
+        authors: paper.authors,
+        abstract: paper.abstract,
+        year: paper.year ? (isNaN(parseInt(paper.year)) ? null : parseInt(paper.year)) : null,
+        source: paper.source,
+        pdfUrl: paper.pdfUrl,
+        isOpenAccess: paper.isOpenAccess,
+        openAccessPdf: paper.openAccessPdf ? JSON.parse(JSON.stringify(paper.openAccessPdf)) : null
+      }
+    });
+    console.log(`[DB] Paper ${paper.id} upserted`);
+  } catch (err) {
+    console.error(`[DB] Failed to upsert paper ${paper.id}:`, err);
+    throw err;
+  }
 
   // Add to reading list
-  await prisma.readingListPaper.create({
-    data: {
-      readingListId: listId,
-      paperId: paper.id
-    }
-  }).catch(() => {
-    // Ignore duplicate key errors (paper already in list)
-  });
+  try {
+    await prisma.readingListPaper.upsert({
+      where: {
+        readingListId_paperId: {
+          readingListId: listId,
+          paperId: paper.id
+        }
+      },
+      create: {
+        readingListId: listId,
+        paperId: paper.id
+      },
+      update: {} // Do nothing if already exists
+    });
+    console.log(`[DB] Paper ${paper.id} linked to list ${listId}`);
+  } catch (err) {
+    console.error(`[DB] Failed to link paper ${paper.id} to list ${listId}:`, err);
+    throw err;
+  }
 }
 
 export async function removePaperFromReadingList(

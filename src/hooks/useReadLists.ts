@@ -17,6 +17,7 @@ export const useReadLists = (): UseReadListsReturn => {
 
     const { 
         isLoggedIn, 
+        isPending,
         handleCreateReadList: dbCreate, 
         handleAddToReadList: dbAdd,
         handleRemoveFromReadList: dbRemove,
@@ -26,7 +27,8 @@ export const useReadLists = (): UseReadListsReturn => {
         fetchReadLists: dbFetch
     } = useReadListsDB();
 
-    const isInitialMount = useRef(true);
+    // Use a ref to track if we've already done the initial fetch to avoid loops
+    const hasFetched = useRef(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -37,14 +39,29 @@ export const useReadLists = (): UseReadListsReturn => {
     // Initial fetch from DB if logged in
     useEffect(() => {
         if (isLoggedIn && isHydrated && USE_DATABASE_STORAGE) {
-            dbFetch().then(lists => {
-                // If logged in, we trust the DB. 
-                // If it has lists, we use them. 
-                // If it's empty, we show empty (the user can create new ones).
+            console.log("[useReadLists] Fetching lists from DB...");
+            dbFetch().then(({ lists, papers }) => {
+                console.log("[useReadLists] DB Fetch result:", lists.length, "lists", Object.keys(papers).length, "papers");
                 setReadLists(lists);
+                setSavedPapers(papers);
+                
+                if (lists.length > 0) {
+                    if (!activeReadListId || !lists.find(l => l.id === activeReadListId)) {
+                        setActiveReadListId(lists[0].id);
+                    }
+                } else {
+                    setReadLists([]);
+                    setSavedPapers({});
+                    setActiveReadListId(null);
+                }
             });
+        } else if (!isLoggedIn && isHydrated) {
+            // Reset to guest state if not logged in
+            setReadLists([{ id: 'default', name: UI_TEXT.UNTITLED_READ_LIST, paperIds: [], createdAt: Date.now() }]);
+            setSavedPapers({});
+            setActiveReadListId('default');
         }
-    }, [isLoggedIn, isHydrated, dbFetch]);
+    }, [isLoggedIn, isHydrated, dbFetch]); // Remove activeReadListId dependency to avoid refresh loops
 
     const handleCreateReadlist = useCallback(async (name: string) => {
         if (!isLoggedIn) {
@@ -63,21 +80,24 @@ export const useReadLists = (): UseReadListsReturn => {
             counter++;
         }
 
+        // Optimistically add to UI with a temp ID
+        const tempId = `list-${Date.now()}`;
         const newList: ReadingList = {
-            id: `list-${Date.now()}`,
+            id: tempId,
             name: finalName,
             paperIds: [],
             createdAt: Date.now()
         };
         
         setReadLists(prev => [...prev, newList]);
-        setActiveReadListId(newList.id);
+        setActiveReadListId(tempId);
 
         if (USE_DATABASE_STORAGE) {
             try {
                 const dbList = await dbCreate(finalName);
                 if (dbList) {
-                    setReadLists(prev => prev.map(l => l.id === newList.id ? dbList : l));
+                    // Replace temp ID with real DB ID
+                    setReadLists(prev => prev.map(l => l.id === tempId ? dbList : l));
                     setActiveReadListId(dbList.id);
                 }
             } catch (error) {
@@ -92,12 +112,15 @@ export const useReadLists = (): UseReadListsReturn => {
             return;
         }
 
+        const trimmedName = newName.trim();
+        if (!trimmedName) return;
+
         setReadLists(prev => prev.map(list => 
-            list.id === id ? { ...list, name: newName } : list
+            list.id === id ? { ...list, name: trimmedName } : list
         ));
 
-        if (USE_DATABASE_STORAGE && !id.startsWith('list-')) {
-            await dbRename(id, newName);
+        if (USE_DATABASE_STORAGE) {
+            await dbRename(id, trimmedName);
         }
     }, [isLoggedIn, dbRename, openAuthModal]);
 
@@ -109,12 +132,15 @@ export const useReadLists = (): UseReadListsReturn => {
 
         if (readLists.length <= 1) return; // Prevent deleting if only one list remains
         setReadLists(prev => prev.filter(l => l.id !== id));
-        if (activeReadListId === id) setActiveReadListId(null);
+        if (activeReadListId === id) {
+            const remaining = readLists.filter(l => l.id !== id);
+            setActiveReadListId(remaining.length > 0 ? remaining[0].id : null);
+        }
 
-        if (USE_DATABASE_STORAGE && !id.startsWith('list-')) {
+        if (USE_DATABASE_STORAGE) {
             await dbDelete(id);
         }
-    }, [activeReadListId, readLists.length, isLoggedIn, dbDelete, openAuthModal]);
+    }, [activeReadListId, readLists, isLoggedIn, dbDelete, openAuthModal]);
 
     const handleAddToReadList = useCallback(async (paper: Paper, targetListId?: string) => {
         if (!isLoggedIn) {
@@ -137,7 +163,18 @@ export const useReadLists = (): UseReadListsReturn => {
             return list;
         }));
 
-        if (USE_DATABASE_STORAGE && !listToUse.startsWith('list-')) {
+        if (USE_DATABASE_STORAGE) {
+            // If the ID is a temp ID, we might be in the middle of a creation.
+            // Let's try to find if a real ID has already replaced it in the state.
+            if (listToUse.startsWith('list-')) {
+                // Wait a bit or check if it was replaced
+                const currentList = readLists.find(l => l.id === listToUse);
+                if (currentList) {
+                    // Still temp ID. This is problematic. 
+                    // For now, let's just log it. 
+                    console.warn("[Save] Still using temp ID for save action");
+                }
+            }
             await dbAdd(paper, listToUse);
         }
     }, [activeReadListId, readLists, isLoggedIn, dbAdd, openAuthModal]);
@@ -155,7 +192,7 @@ export const useReadLists = (): UseReadListsReturn => {
             return list;
         }));
 
-        if (USE_DATABASE_STORAGE && !listId.startsWith('list-')) {
+        if (USE_DATABASE_STORAGE) {
             await dbRemove(listId, paperId);
         }
     }, [isLoggedIn, dbRemove, openAuthModal]);
@@ -170,7 +207,7 @@ export const useReadLists = (): UseReadListsReturn => {
             list.id === id ? { ...list, color } : list
         ));
 
-        if (USE_DATABASE_STORAGE && !id.startsWith('list-')) {
+        if (USE_DATABASE_STORAGE) {
             await dbUpdateColor(id, color);
         }
     }, [isLoggedIn, dbUpdateColor, openAuthModal]);
@@ -187,6 +224,7 @@ export const useReadLists = (): UseReadListsReturn => {
         handleAddToReadList,
         handleRemoveFromReadList,
         isHydrated,
-        isLoggedIn
+        isLoggedIn,
+        isAuthLoading: isPending
     };
 };

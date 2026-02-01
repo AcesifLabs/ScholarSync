@@ -46,7 +46,8 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         handleAddToReadList,
         handleRemoveFromReadList,
         isHydrated,
-        isLoggedIn
+        isLoggedIn,
+        isAuthLoading
     } = useReadLists();
 
     const isSyncing = queryParam && queryParam !== activeQuery;
@@ -63,11 +64,11 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
     }, [queryParam, searchState.isLoading, isSyncing]);
 
     useEffect(() => {
-        if (isSyncing && isHydrated && searchState.query !== '') {
+        if (isSyncing && isHydrated && !isAuthLoading) {
             handleSearch(queryParam);
 
             // Only perform automatic list management if logged in
-            if (isLoggedIn) {
+            if (isLoggedIn && queryParam) {
                 const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
 
                 if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
@@ -77,7 +78,7 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
                 }
             }
         }
-    }, [queryParam, activeQuery, handleSearch, handleCreateReadList, handleRenameReadList, isSyncing, activeReadListId, readLists, isHydrated, searchState.query, isLoggedIn]);
+    }, [queryParam, isSyncing, isHydrated, isAuthLoading, isLoggedIn]); // Optimized dependencies
 
     const showSkeletons = (searchState.isLoading && searchState.results.length === 0) || isSyncing || initialLoad;
     const hasResults = searchState.results.length > 0;
@@ -103,7 +104,7 @@ export function SearchResultsContent({ initialResults, query, isLoading = false 
         e?.preventDefault();
         const trimmedQuery = searchState.query.trim();
         if (trimmedQuery) {
-            if (isLoggedIn) {
+            if (isLoggedIn && !isAuthLoading) {
                 const listToRename = readLists.find(l => l.id === activeReadListId) || readLists.find(l => l.id === 'default');
 
                 if (listToRename && (listToRename.name === UI_TEXT.UNTITLED_READ_LIST || listToRename.name === UI_TEXT.UNTITLED_LIST || listToRename.name === UI_TEXT.UNTITLED_READING_LIST)) {
