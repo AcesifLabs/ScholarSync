@@ -108,19 +108,6 @@ export default function Home() {
                 />
             ) : (
                 <div className="flex flex-col h-full">
-                    {activeList && activeList.paperIds.length === 0 && (
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 w-full">
-                            <div className="bg-scholar-50 border border-scholar-100 rounded-xl p-4 flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-lg font-bold text-scholar-900">{activeList.name}</h2>
-                                    <p className="text-sm text-scholar-700">This list is currently empty. Use the search below to add papers.</p>
-                                </div>
-                                <div className="hidden sm:block">
-                                    <span className="text-xs font-semibold text-scholar-600 uppercase tracking-wider">New List</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                     {renderSearchContent()}
                 </div>
             )}

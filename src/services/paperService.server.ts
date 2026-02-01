@@ -22,20 +22,20 @@ async function makeRequest(url: string, useKey: boolean, retries = 5, backoff = 
         });
 
         if (!response.ok) {
-            // Handle 429 Too Many Requests with exponential backoff
+            // Handle 429 Too Many Requests with exponential backoff silently (retrying)
             if (response.status === 429 && retries > 0) {
-                console.warn(`[SSR Fetch] 429 Too Many Requests, retrying in ${backoff}ms... (${retries} retries left)`);
                 await new Promise(resolve => setTimeout(resolve, backoff));
                 return makeRequest(url, useKey, retries - 1, backoff * 2);
             }
 
-            const errorBody = await response.json().catch(() => ({}));
-            console.error(`[SSR Fetch] Error (useKey=${useKey}, url=${url}): ${response.status} ${response.statusText}`, JSON.stringify(errorBody));
-
+            // If we have an API key and get a 403, fallback to public tier silently
             if (useKey && response.status === 403) {
-                console.warn("[SSR Fetch] 403 Forbidden with API key, falling back to public tier (no key)");
                 return makeRequest(url, false, retries, backoff);
             }
+
+            // Only log if we're not retrying or falling back
+            const errorBody = await response.json().catch(() => ({}));
+            console.error(`[SSR Fetch] Final Error (useKey=${useKey}, url=${url}): ${response.status} ${response.statusText}`, JSON.stringify(errorBody));
 
             return null;
         }
@@ -43,7 +43,6 @@ async function makeRequest(url: string, useKey: boolean, retries = 5, backoff = 
         return response.json();
     } catch (error) {
         if (retries > 0) {
-            console.warn(`[SSR Fetch] Exception, retrying in ${backoff}ms... (${retries} retries left)`, error);
             await new Promise(resolve => setTimeout(resolve, backoff));
             return makeRequest(url, useKey, retries - 1, backoff * 2);
         }

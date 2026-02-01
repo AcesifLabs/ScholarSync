@@ -73,10 +73,10 @@ export const useReadLists = () => {
     }, []);
 
     const handleDeleteReadList = useCallback((id: string) => {
-        if (id === 'default') return; // Prevent deleting the default list
+        if (readLists.length <= 1) return; // Prevent deleting if only one list remains
         setReadLists(prev => prev.filter(l => l.id !== id));
         if (activeReadListId === id) setActiveReadListId(null);
-    }, [activeReadListId]);
+    }, [activeReadListId, readLists.length]);
 
     const handleAddToReadList = useCallback((paper: Paper, targetListId?: string) => {
         const listToUse = targetListId || activeReadListId || (readLists.length > 0 ? readLists[0].id : null);

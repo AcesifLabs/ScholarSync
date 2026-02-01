@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menu, GraduationCap } from 'lucide-react';
 import { ReadListSidebar } from './ReadListSidebar';
 import { Paper, ReadingList } from '@/types';
@@ -42,6 +42,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     scrollRef,
     onStartNewReadList
 }) => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
     return (
         <div className="flex h-screen bg-slate-50/50">
             <ReadListSidebar
@@ -65,6 +67,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     onStartNewReadList();
                     setSidebarOpen(false);
                 }}
+                isCollapsed={isCollapsed}
+                onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
             />
 
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
