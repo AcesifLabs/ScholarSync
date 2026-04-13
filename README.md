@@ -12,37 +12,94 @@ ScholarSync is an advanced research paper discovery and management tool designed
 
 ## 🛠 Tech Stack
 
-- **Framework**: [Vite](https://vitejs.dev/) + [React 19](https://reactjs.org/)
-- **AI/ML**: [@google/genai](https://www.npmjs.com/package/@google/genai) (Gemini 2.0 Flash)
+- **Frontend**: [Next.js 16](https://nextjs.org/) + [React 19](https://reactjs.org/)
+- **Backend**: [Spring Boot 3.4](https://spring.io/projects/spring-boot) + Java 17
+- **Database**: PostgreSQL 15
+- **Authentication**: JWT via HTTP-only cookies
 - **Graph Visualization**: [@xyflow/react](https://reactflow.dev/)
+- **AI/ML**: [@google/genai](https://www.npmjs.com/package/@google/genai) (Gemini 2.0 Flash)
 - **API**: [Semantic Scholar Graph API](https://api.semanticscholar.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+
+## 📁 Project Structure
+
+```
+scholarsync/
+├── scholarsync-frontend/     # Next.js 16 application (port 6969)
+├── scholarsync-backend/   # Spring Boot API (port 8080)
+└── docker-compose.yml  # Database services
+```
 
 ## 🏃 Run Locally
 
-**Prerequisites:** Node.js (v18+)
+### Prerequisites
 
-1. **Install dependencies:**
-   ```bash
-   pnpm install
-   # or
-   npm install
-   ```
+- Node.js 20+
+- Java 17+
+- PostgreSQL 15+
+- pnpm
 
-2. **Configure Environment:**
-   Create or edit `.env.local` and add your API keys:
-   ```env
-   GEMINI_API_KEY=your_gemini_key_here
-   SEMANTIC_SCHOLAR_API_KEY=your_semantic_scholar_key_here
-   ```
+### 1. Start Database (Optional - if not using Docker Compose)
 
-3. **Start the development server:**
-   ```bash
-   pnpm dev
-   # or
-   npm run dev
-   ```
+```bash
+docker-compose up -d
+```
+
+### 2. Start Backend
+
+```bash
+cd scholarsync-backend
+cp .env.example .env.development.local
+./gradlew bootRun
+```
+
+The backend runs on `http://localhost:8080`.
+
+### 3. Start Frontend
+
+```bash
+cd scholarsync-frontend
+cp .env.example .env.local  # Configure NEXT_PUBLIC_GEMINI_API_KEY
+pnpm install
+pnpm dev
+```
+
+The frontend runs on `http://localhost:6969`.
+
+## Environment Variables
+
+### Frontend (.env.local)
+
+```env
+NEXT_PUBLIC_GEMINI_API_KEY=...
+API_BASE_URL=http://localhost:8080
+```
+
+### Backend (.env.development.local)
+
+```env
+DATABASE_URL=jdbc:postgresql://localhost:5432/scholarsync
+DATABASE_USERNAME=scholarsync
+DATABASE_PASSWORD=...
+JWT_SECRET=...
+SEMANTIC_SCHOLAR_API_KEY=...
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|------------|
+| POST | /api/auth/signup | Register new user |
+| POST | /api/auth/signin | Sign in user |
+| POST | /api/auth/refresh | Refresh token |
+| POST | /api/auth/signout | Sign out |
+| GET | /api/auth/me | Get current user |
+| GET | /api/reading-lists | List user's reading lists |
+| POST | /api/reading-lists | Create reading list |
+| GET | /api/papers/search | Search papers |
+| GET | /api/papers/{id} | Get paper details |
 
 ## 📈 Using the Research Graph
 
@@ -51,3 +108,13 @@ ScholarSync is an advanced research paper discovery and management tool designed
 3. You will be navigated to the **Research Graph** view.
 4. Drag to pan, scroll to zoom.
 5. Click **"Related"** on any node in the graph to discover deeper connections and expand your research map progressively.
+
+## 🐳 Docker Compose
+
+The root `docker-compose.yml` starts only the PostgreSQL database:
+
+```bash
+docker-compose up -d
+```
+
+For full-stack deployment with backend, see `scholarsync-backend/docker-compose.yml`.

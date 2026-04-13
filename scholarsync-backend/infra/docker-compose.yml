@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: scholarsync
+      POSTGRES_USER: scholarsync
+      POSTGRES_PASSWORD: scholarsync_dev_password
+    ports:
+      - "5555:5432"

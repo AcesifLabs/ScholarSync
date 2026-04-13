@@ -1,0 +1,44 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'scholarsync-backend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'scholarsync-backend/**'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scholarsync-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./scholarsync-backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/scholarsync-app:latest
+          cache-from: type=gha,mode=max
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo "Digest: ${{ steps.build.outputs.digest }}"
