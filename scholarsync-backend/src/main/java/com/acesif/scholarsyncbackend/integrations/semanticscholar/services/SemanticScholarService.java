@@ -2,9 +2,6 @@ package com.acesif.scholarsyncbackend.integrations.semanticscholar.services;
 
 import com.acesif.scholarsyncbackend.commons.config.properties.SemanticScholar;
 import com.acesif.scholarsyncbackend.integrations.semanticscholar.dtos.AutoCompleteResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

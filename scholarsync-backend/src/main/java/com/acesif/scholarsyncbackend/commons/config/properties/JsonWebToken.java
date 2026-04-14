@@ -13,4 +13,5 @@ public class JsonWebToken {
   private String secret;
   private String issuerUrl;
   private String expirationMs;
+  private String frontendUrl;
 }

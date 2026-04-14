@@ -1,47 +1,43 @@
 package com.acesif.scholarsyncbackend.users.entities;
 
-import com.acesif.scholarsyncbackend.users.enums.ERole;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
+import com.acesif.scholarsyncbackend.users.enums.EAuthProvider;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String id;
 
-  @Column(unique = true, nullable = false)
+  @Column(unique = true)
+  private String googleId;
+
+  @Column(unique = true)
+  private String orcidId;
+
+  @Column(nullable = false, unique = true)
   private String email;
 
   private String name;
   private String avatarUrl;
 
-  @Column(nullable = false)
-  private String provider;
-
-  @Column(nullable = false)
-  private String providerId;
-
   @Enumerated(EnumType.STRING)
-  private ERole role = ERole.USER;
+  private EAuthProvider primaryProvider;
 
   @CreationTimestamp
-  private LocalDateTime createdAt;
+  @Column(nullable = false, updatable = false)
+  private Instant createdAt;
 
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+  private Instant lastLoginAt;
 }

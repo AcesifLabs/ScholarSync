@@ -1,56 +1,74 @@
 package com.acesif.scholarsyncbackend.auth.services;
 
+import com.acesif.scholarsyncbackend.auth.dtos.UserDTO;
 import com.acesif.scholarsyncbackend.commons.config.properties.JsonWebToken;
-import com.acesif.scholarsyncbackend.users.entities.User;
-import io.jsonwebtoken.Claims;
+import com.acesif.scholarsyncbackend.users.repositories.UserRepository;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
   private final JsonWebToken jwtProperties;
-  private final DateFormat dateFormat = new SimpleDateFormat();
+  private final UserRepository userRepository;
+  private final SecretKey key;
 
-  public String generateToken(User user) {
+  public JwtService(JsonWebToken jwtProperties, UserRepository userRepository) {
+    this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    this.jwtProperties = jwtProperties;
+    this.userRepository = userRepository;
+  }
 
-    Date expirationMs;
-    try {
-      expirationMs = dateFormat.parse(System.currentTimeMillis() + jwtProperties.getExpirationMs());
-    } catch (Exception e) {
-      expirationMs = new Date();
-      e.fillInStackTrace();
-    }
+  public String generateToken(String userId) {
+    long expirationMillis = Long.parseLong(jwtProperties.getExpirationMs());
+    Date expiration = new Date(System.currentTimeMillis() + expirationMillis);
 
     return Jwts.builder()
-            .setSubject(user.getId().toString())
-            .claim("email", user.getEmail())
-            .claim("role", user.getRole().name())
-            .setIssuedAt(new Date())
-            .setExpiration(expirationMs)
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .signWith(key)
+            .subject(userId)
+            .issuedAt(new Date())
+            .expiration(expiration)
             .compact();
   }
 
-  public Claims validateAndParseClaims(String token) {
-    return Jwts.parserBuilder()
-            .setSigningKey(getSigningKey())
+  public String extractUserId(String token) {
+    return Jwts.parser()
+            .verifyWith(key)
             .build()
-            .parseClaimsJws(token)
-            .getBody();
+            .parseSignedClaims(token)
+            .getPayload()
+            .getSubject();
   }
 
-  private Key getSigningKey() {
-    return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecret()));
+  public boolean isValid(String token) {
+    try {
+      Jwts.parser()
+              .verifyWith(key)
+              .build()
+              .parseSignedClaims(token);
+      return true;
+    } catch (JwtException | IllegalArgumentException e) {
+      return false;
+    }
+  }
+
+  public UserDTO getUserFromToken(String token) {
+    String userId = extractUserId(token);
+    return userRepository.findById(userId)
+            .map(user -> new UserDTO(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    user.getAvatarUrl(),
+                    user.getPrimaryProvider().name(),
+                    user.getOrcidId()
+            ))
+            .orElseThrow(() -> new RuntimeException("User not found"));
   }
 }
