@@ -2,7 +2,7 @@
 
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/app/lib/providers/AuthProvider";
-import { getGoogleAuthUrl } from "@/app/lib/auth";
+import { getGoogleAuthUrl } from "@/app/api/auth";
 import Image from "next/image";
 
 export function GoogleOAuth() {

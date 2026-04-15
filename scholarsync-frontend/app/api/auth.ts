@@ -9,7 +9,7 @@ export async function fetchCurrentUser(): Promise<User | null> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/v1/auth/me`, {
       method: 'GET',
-      credentials: 'include', // Sends HttpOnly session cookies
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
       },

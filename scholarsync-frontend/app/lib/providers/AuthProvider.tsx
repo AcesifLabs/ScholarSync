@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchCurrentUser, logoutRequest } from '@/app/lib/auth';
+import { fetchCurrentUser, logoutRequest } from '@/app/api/auth';
 import { AUTH_QUERY_KEY, AUTH_STALE_TIME } from './AuthProvider.constants';
 import { AuthContextType } from './AuthProvider.types';
 
