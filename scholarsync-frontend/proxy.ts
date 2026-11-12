@@ -1,35 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PROTECTED_PATHS } from '@/app/lib/providers/AuthProvider.constants';
+import { isProtectedPath } from '@/app/lib/utils/routes';
+import { AUTH_COOKIE, RETURN_TO_COOKIE, RETURN_TO_MAX_AGE_SECONDS, SIGN_IN_REQUIRED_PARAM } from '@/app/lib/constants/auth.constants';
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Check if the current path starts with any of the protected path prefixes
-  const isProtected = PROTECTED_PATHS.some(path => pathname.startsWith(path));
-
-  if (isProtected) {
-    // Rely on the presence of the session cookie. 
-    // Backend will return 401 if it's invalid, which AuthProvider handles.
-    const token = request.cookies.get('JSESSIONID') || request.cookies.get('auth_token');
-    
-    if (!token) {
-      // Redirect to home (which has the Sign In button)
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+  // Presence check only: the backend validates the JWT and AuthGate handles an expired one.
+  if (isProtectedPath(request.nextUrl.pathname) && !request.cookies.get(AUTH_COOKIE)) {
+    // The flag tells the home page to say why the visitor landed there
+    const response = NextResponse.redirect(new URL(`/?${SIGN_IN_REQUIRED_PARAM}=required`, request.url));
+    // Remembered so /auth/callback can return here after Google sign-in (e.g. an invite link).
+    // Not encoded here: cookies.set URL-encodes the value itself, and safeReturnPath decodes it once.
+    response.cookies.set(RETURN_TO_COOKIE, request.nextUrl.pathname + request.nextUrl.search, {
+      path: '/', maxAge: RETURN_TO_MAX_AGE_SECONDS, sameSite: 'lax',
+    });
+    return response;
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-      /*
-       * Match all request paths except for the ones starting with:
-       * - api (API routes)
-       * - _next/static (static files)
-       * - _next/image (image optimization files)
-       * - favicon.ico (favicon file)
-       */
-      '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

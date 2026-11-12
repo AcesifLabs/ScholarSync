@@ -1,21 +1,21 @@
 spring:
   application:
     name: scholarsync-backend
+  config:
+    import: optional:file:.env.dev.local[.properties],optional:file:scholarsync-backend/.env.dev.local[.properties]
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5555/scholarsync}
-    username: ${DATABASE_USERNAME:scholarsync}
-    password: ${DATABASE_PASSWORD:scholarsync_dev_password}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
   docker:
     compose:
+      # Starts Postgres + MinIO with the app (dev only; the dependency is developmentOnly). Path is relative to the repo root.
+      file: scholarsync-backend/infra/docker-compose.yml
       lifecycle-management: start-and-stop
-      file: infra/docker-compose.yml
-      skip:
-        in-tests: false
-      profiles:
-        active: dev
+
   devtools:
     livereload:
       enabled: true
@@ -24,12 +24,41 @@ spring:
       enabled: true
 
   jpa:
+    # Off: an open session would hold a pooled connection through source calls and PDF streams
+    open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         format_sql: true
+        # search results upsert up to a few hundred papers at once
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  servlet:
+    multipart:
+      # single source: pdf.max-bytes
+      max-file-size: ${pdf.max-bytes}B
+      # pdf.max-bytes + 1MB for the multipart envelope. Kept literal because property placeholders cannot do
+      # arithmetic; change it together with pdf.max-bytes.
+      max-request-size: 51MB
+
+  threads:
+    virtual:
+      # Request threads and MVC async work (PDF streaming) run on virtual threads instead of a small fixed pool
+      enabled: true
+
+  mvc:
+    async:
+      # PDF streaming runs as an async request; the servlet default (30s) cuts off large files
+      request-timeout: 180s
+
+  cache:
+    caffeine:
+      spec: maximumSize=5000,expireAfterWrite=1h
 
   security:
     oauth2:
@@ -39,48 +68,74 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: openid, email, profile
-            redirect-uri: "${REDIRECT_BASE_URL:http://localhost:9000/scholarsync-api}/login/oauth2/code/google"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
-          orcid:
-            client-id: ${ORCID_CLIENT_ID}
-            client-secret: ${ORCID_CLIENT_SECRET}
-            authorization-grant-type: authorization_code
-            redirect-uri: "${REDIRECT_BASE_URL}/login/oauth2/code/orcid"
-            scope: openid, /authenticate
-
-        provider:
-          orcid:
-            authorization-uri: https://orcid.org/oauth/authorize
-            token-uri: https://orcid.org/oauth/token
-            user-info-uri: https://orcid.org/oauth/userinfo
-            user-name-attribute: sub
-
+# Paper sources (ADR 0005). Only OPENALEX_API_KEY and SOURCES_CONTACT_EMAIL need setting.
 external:
-  semantic-scholar:
-    base-url: ${SEMANTIC_SCHOLAR_BASE_URL:semantic-scholar-base-url}
-    api-key: ${SEMANTIC_SCHOLAR_API_KEY:hYk5dQNvb22Elj1cgGNix5wUaB7h6tTlYYwVFu97}
-  google:
-    client-id: ${GOOGLE_CLIENT_ID:google-client-id.apps.googleusercontent.com}
-    client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret}
+  # Your contact address: Crossref's polite pool (mailto), Unpaywall (email, required) and OpenAlex
+  contact-email: ${SOURCES_CONTACT_EMAIL:}
+  # min-interval / max-concurrent follow each source's published rate limit (ADR 0005)
+  openalex:
+    base-url: https://api.openalex.org
+    # Free key from https://openalex.org/settings/api (required since February 2026)
+    api-key: ${OPENALEX_API_KEY:}
+    min-interval: 100ms
+    max-concurrent: 5
+  crossref:
+    base-url: https://api.crossref.org
+    # polite pool: list queries 3 per second, 3 in flight
+    min-interval: 334ms
+    max-concurrent: 3
+  arxiv:
+    base-url: https://export.arxiv.org/api
+    # API terms: one request every 3 seconds, one connection
+    min-interval: 3s
+    max-concurrent: 1
+  europepmc:
+    base-url: https://www.ebi.ac.uk/europepmc/webservices/rest
+    # 10 requests per second per IP
+    min-interval: 100ms
+    max-concurrent: 5
+  opencitations:
+    base-url: https://api.opencitations.net/index/v2
+    # Optional access token from https://opencitations.net/accesstoken
+    api-key: ${OPENCITATIONS_API_KEY:}
+    # no published limit
+    min-interval: 200ms
+    max-concurrent: 2
+  unpaywall:
+    base-url: https://api.unpaywall.org
+    # Off until its commercial terms are confirmed; also needs contact-email
+    enabled: ${UNPAYWALL_ENABLED:false}
+    min-interval: 100ms
+    max-concurrent: 2
+
+# search.* (federated search and its cache) defaults live in SearchProperties
+
+storage:
+  endpoint: ${STORAGE_ENDPOINT:http://localhost:9100}
+  access-key: ${STORAGE_ACCESS_KEY}
+  secret-key: ${STORAGE_SECRET_KEY}
+  bucket: ${STORAGE_BUCKET:scholarsync}
+
+pdf:
+  max-bytes: 52428800
 
 server:
   port: 9000
   servlet:
     context-path: /scholarsync-api
 
-management:
-  endpoints:
-    web:
-      cors:
-        allowed-origins: ${FRONTEND_URL:http://localhost:6969}
-
 jwt:
-   secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-at-least-32-characters}
-   issuer-url: ${JWT_ISSUER_URI:http://localhost:9000}
-   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-   frontend-url: ${FRONTEND_URL:http://localhost:6969}
+   secret: ${JWT_SECRET}
+   issuer-url: ${JWT_ISSUER_URI}
+   expiration-ms: ${JWT_EXPIRATION_MS}
+   frontend-url: ${FRONTEND_URL}
+   # Secure by default; local HTTP development opts out with JWT_SECURE_COOKIE=false in .env.dev.local
+   secure-cookie: ${JWT_SECURE_COOKIE:true}
 
 springdoc:
+  default-produces-media-type: application/json
   api-docs:
     path: /api-docs
   swagger-ui:

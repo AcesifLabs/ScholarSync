@@ -4,6 +4,368 @@
  */
 
 export interface paths {
+    "/api/v1/library/{paperId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save paper
+         * @description Adds a paper to the library (idempotent; restores it if archived)
+         */
+        put: operations["save"];
+        post?: never;
+        /**
+         * Remove paper
+         * @description Removes a paper from the library (idempotent)
+         */
+        delete: operations["remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Update saved paper
+         * @description Change reading status, archive state and/or the last page read
+         */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/collections/{id}/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Reorder papers */
+        put: operations["reorder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get PDF
+         * @description Streams the uploaded PDF or the open-access copy
+         */
+        get: operations["get"];
+        put?: never;
+        /**
+         * Upload PDF
+         * @description Attach a PDF to a paper that has none; the paper must be in your library or in a group where you are a member or above
+         */
+        post: operations["upload"];
+        /**
+         * Remove uploaded PDF
+         * @description Uploader only, while the paper has no annotations
+         */
+        delete: operations["removeUpload"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List annotations
+         * @description Your private annotations plus those of your groups
+         */
+        get: operations["list"];
+        put?: never;
+        /** Create annotation */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations/{id}/unresolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen thread */
+        post: operations["unresolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve thread */
+        post: operations["resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations/{id}/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reply to annotation */
+        post: operations["reply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark one as read */
+        post: operations["markRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark all as read */
+        post: operations["markAllRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My groups */
+        get: operations["mine"];
+        put?: never;
+        /**
+         * Create group
+         * @description The creator becomes the owner
+         */
+        post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Group papers */
+        get: operations["papers"];
+        put?: never;
+        /**
+         * Add paper to group
+         * @description Member or above
+         */
+        post: operations["addPaper"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/papers/{paperId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Discussion thread for a paper */
+        get: operations["comments"];
+        put?: never;
+        /**
+         * Post comment
+         * @description Member or above; Markdown body; parentId for a reply
+         */
+        post: operations["comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List members */
+        get: operations["members"];
+        put?: never;
+        /**
+         * Add member by email
+         * @description Admin or owner. Always 202 with no body: if the address has an account that is not yet a member, it is added. The answer does not reveal which, so reload the member list to see the result.
+         */
+        post: operations["addMember"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Leave group */
+        post: operations["leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Active invite links
+         * @description Admin or owner
+         */
+        get: operations["invites"];
+        put?: never;
+        /**
+         * Create invite link
+         * @description Admin or owner
+         */
+        post: operations["createInvite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/join/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join by invite link */
+        post: operations["join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List collections
+         * @description The user's active collections, or archived ones
+         */
+        get: operations["list_1"];
+        put?: never;
+        /** Create collection */
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collections/{id}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add paper
+         * @description Appends a paper (idempotent) and saves it to the library
+         */
+        post: operations["addPaper_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/logout": {
         parameters: {
             query?: never;
@@ -24,7 +386,104 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/integrations/semantic-scholar/autocomplete": {
+    "/api/v1/papers/{paperId}/annotations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete annotation
+         * @description Author, or a group admin for group annotations
+         */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit annotation
+         * @description Author only (group annotations also need the member role): colour and comment
+         */
+        patch: operations["update_1"];
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get group */
+        get: operations["get_1"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete group
+         * @description Owner only
+         */
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        /**
+         * Update group
+         * @description Admin or owner
+         */
+        patch: operations["update_2"];
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove member
+         * @description Admin or owner; only the owner can remove an admin. Revokes their invite links
+         */
+        delete: operations["removeMember"];
+        options?: never;
+        head?: never;
+        /**
+         * Change member role
+         * @description Admin or owner; only the owner can change an admin
+         */
+        patch: operations["changeRole"];
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete comment
+         * @description Author or admin; soft delete
+         */
+        delete: operations["deleteComment"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit comment
+         * @description Author only
+         */
+        patch: operations["editComment"];
+        trace?: never;
+    };
+    "/api/v1/collections/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -32,10 +491,381 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Query autocomplete
-         * @description Returns paper query suggestions based on a search term
+         * Get collection
+         * @description Collection with its papers in order
          */
-        get: operations["queryCompletion"];
+        get: operations["get_2"];
+        put?: never;
+        post?: never;
+        /** Delete collection */
+        delete: operations["delete_2"];
+        options?: never;
+        head?: never;
+        /**
+         * Update collection
+         * @description Rename, describe, share/unshare, archive/unarchive
+         */
+        patch: operations["update_3"];
+        trace?: never;
+    };
+    "/api/v1/collections/{id}/papers/{paperId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove paper */
+        delete: operations["removePaper"];
+        options?: never;
+        head?: never;
+        /** Edit note and tags */
+        patch: operations["updateEntry"];
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get paper
+         * @description Merged paper metadata; refreshed from the sources when older than search.paper-ttl
+         */
+        get: operations["get_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Citation graph
+         * @description Nodes and cites-links within depth hops of the paper
+         */
+        get: operations["graph"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/graph/expand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Expand node
+         * @description One hop around a paper, merged into an existing graph by the client
+         */
+        get: operations["expand"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export annotations
+         * @description Markdown, ordered by page
+         */
+        get: operations["export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search papers
+         * @description Merged results from OpenAlex, Crossref, Europe PMC and arXiv, served from the search cache when a similar query was seen
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/autocomplete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Autocomplete
+         * @description Paper title suggestions for a partial query
+         */
+        get: operations["autocomplete"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List notifications
+         * @description Newest first; page with before=<createdAt of the last item>
+         */
+        get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unread count */
+        get: operations["unreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List library
+         * @description Saved papers, optionally filtered by status, or the archived ones
+         */
+        get: operations["list_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/states": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Library states
+         * @description paperId → status for every saved paper, used to mark search results
+         */
+        get: operations["states"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/annotations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Group annotations
+         * @description Every annotation shared with the group, newest first; any member, viewers included
+         */
+        get: operations["list_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Activity feed
+         * @description Newest first; page with before=<last id>
+         */
+        get: operations["activity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/activity/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent activity in all my groups */
+        get: operations["myActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collections/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export collection
+         * @description format=bibtex or markdown; returned as a file download
+         */
+        get: operations["export_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/collections/shared/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shared collection
+         * @description Public read-only view by share token
+         */
+        get: operations["shared"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authors/{authorId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get author
+         * @description Profile with paper count, citations and h-index
+         */
+        get: operations["get_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authors/{authorId}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Author papers */
+        get: operations["papers_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authors/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search authors */
+        get: operations["search_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -64,23 +894,509 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/actuator": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Actuator root web endpoint */
+        get: operations["links"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/actuator/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Actuator web endpoint 'health' */
+        get: operations["health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/papers/{paperId}/annotations/{id}/replies/{replyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete reply
+         * @description Reply author only
+         */
+        delete: operations["deleteReply"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/papers/{paperId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove paper from group
+         * @description Admin or owner
+         */
+        delete: operations["removePaper_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{groupId}/invites/{inviteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke invite link
+         * @description Admin or owner
+         */
+        delete: operations["revokeInvite"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        LibraryItemResponse: {
+            paper: components["schemas"]["PaperSummary"];
+            /** @enum {string} */
+            status: "TO_READ" | "IN_PROGRESS" | "DONE";
+            archived: boolean;
+            /** Format: date-time */
+            addedAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: int32 */
+            lastPage: number;
+        };
+        PaperAuthor: {
+            id: string;
+            name: string;
+        };
+        PaperSummary: {
+            id: string;
+            title: string;
+            authors: components["schemas"]["PaperAuthor"][];
+            /** Format: int32 */
+            year: number;
+            venue: string;
+            abstractText: string;
+            /** Format: int32 */
+            citationCount: number;
+            openAccess: boolean;
+            fieldsOfStudy: string[];
+            publicationTypes: string[];
+            sources: string[];
+            hasPdf: boolean;
+        };
+        CollectionReorderRequest: {
+            paperIds: string[];
+        };
+        CollectionDetail: {
+            collection: components["schemas"]["CollectionSummary"];
+            entries: components["schemas"]["CollectionEntry"][];
+        };
+        CollectionEntry: {
+            paper: components["schemas"]["PaperSummary"];
+            /** Format: int32 */
+            position: number;
+            note: string;
+            tags: string[];
+            /** Format: date-time */
+            addedAt: string;
+        };
+        CollectionSummary: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            visibility: "PRIVATE" | "PUBLIC_LINK";
+            shareToken: string;
+            archived: boolean;
+            /** Format: int64 */
+            paperCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        AnnotationCreateRequest: {
+            /** @enum {string} */
+            visibility: "PRIVATE" | "GROUP";
+            /** Format: uuid */
+            groupId?: string;
+            /** @enum {string} */
+            color: "YELLOW" | "GREEN" | "RED" | "BLUE";
+            position: {
+                [key: string]: unknown;
+            };
+            quote?: string;
+            comment?: string;
+        };
+        AnnotationResponse: {
+            /** Format: uuid */
+            id: string;
+            paperId: string;
+            author: components["schemas"]["UserRef"];
+            /** @enum {string} */
+            visibility: "PRIVATE" | "GROUP";
+            /** Format: uuid */
+            groupId: string;
+            /** @enum {string} */
+            color: "YELLOW" | "GREEN" | "RED" | "BLUE";
+            position: {
+                [key: string]: unknown;
+            };
+            quote: string;
+            comment: string;
+            resolved: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            replies: components["schemas"]["ReplyResponse"][];
+        };
+        ReplyResponse: {
+            /** Format: uuid */
+            id: string;
+            author: components["schemas"]["UserRef"];
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        UserRef: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            avatarUrl: string;
+        };
+        ReplyCreateRequest: {
+            body: string;
+        };
+        GroupCreateRequest: {
+            name: string;
+            description?: string;
+            tags?: string[];
+        };
+        GroupSummary: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description: string;
+            tags: string[];
+            /** @enum {string} */
+            myRole: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+            /** Format: int64 */
+            memberCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        GroupPaperAddRequest: {
+            paperId: string;
+        };
+        GroupPaperResponse: {
+            paper: components["schemas"]["PaperSummary"];
+            addedBy: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            addedAt: string;
+        };
+        CommentCreateRequest: {
+            bodyMd: string;
+            /** Format: uuid */
+            parentId?: string;
+        };
+        CommentResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            parentId: string;
+            author: components["schemas"]["UserRef"];
+            bodyMd: string;
+            deleted: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            editedAt: string;
+        };
+        MemberAddRequest: {
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+        };
+        InviteCreateRequest: {
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+            /** Format: int32 */
+            expiresInHours?: number;
+        };
+        InviteResponse: {
+            /** Format: uuid */
+            id: string;
+            token: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CollectionCreateRequest: {
+            name: string;
+            description?: string;
+        };
+        CollectionAddPaperRequest: {
+            paperId: string;
+        };
+        AnnotationUpdateRequest: {
+            /** @enum {string} */
+            color?: "YELLOW" | "GREEN" | "RED" | "BLUE";
+            comment?: string;
+        };
+        LibraryItemUpdateRequest: {
+            /** @enum {string} */
+            status?: "TO_READ" | "IN_PROGRESS" | "DONE";
+            archived?: boolean;
+            /** Format: int32 */
+            lastPage?: number;
+        };
+        GroupUpdateRequest: {
+            name?: string;
+            description?: string;
+            tags?: string[];
+        };
+        MemberRoleRequest: {
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+        };
+        MemberResponse: {
+            user: components["schemas"]["UserRef"];
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
+            /** Format: date-time */
+            joinedAt: string;
+        };
+        CommentUpdateRequest: {
+            bodyMd: string;
+        };
+        CollectionUpdateRequest: {
+            name?: string;
+            description?: string;
+            /** @enum {string} */
+            visibility?: "PRIVATE" | "PUBLIC_LINK";
+            archived?: boolean;
+        };
+        CollectionEntryUpdateRequest: {
+            note?: string;
+            tags?: string[];
+        };
+        PaperDetail: {
+            id: string;
+            title: string;
+            authors: components["schemas"]["PaperAuthor"][];
+            /** Format: int32 */
+            year: number;
+            venue: string;
+            abstractText: string;
+            /** Format: int32 */
+            citationCount: number;
+            /** Format: int32 */
+            referenceCount: number;
+            fieldsOfStudy: string[];
+            publicationTypes: string[];
+            externalIds: {
+                [key: string]: unknown;
+            };
+            openAccess: boolean;
+            hasPdf: boolean;
+            sources: string[];
+            pdfUploadedByYou: boolean;
+        };
+        StreamingResponseBody: unknown;
+        CitationGraph: {
+            rootId: string;
+            nodes: components["schemas"]["GraphNode"][];
+            links: components["schemas"]["GraphLink"][];
+        };
+        GraphLink: {
+            source: string;
+            target: string;
+        };
+        GraphNode: {
+            id: string;
+            title: string;
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            citationCount: number;
+            authors: components["schemas"]["PaperAuthor"][];
+            /** Format: int32 */
+            depth: number;
+        };
+        PaperSearchResponse: {
+            /** Format: int32 */
+            total: number;
+            /** Format: int32 */
+            offset: number;
+            /** Format: int32 */
+            limit: number;
+            items: components["schemas"]["PaperSummary"][];
+        };
         AutoCompleteResponse: {
-            matches?: components["schemas"]["Matches"][];
+            matches: components["schemas"]["Matches"][];
         };
         Matches: {
-            id?: string;
-            title?: string;
-            authorsYear?: string;
+            id: string;
+            title: string;
+            authorsYear: string;
+        };
+        NotificationResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "GROUP_ADDED" | "ANNOTATION_REPLY" | "COMMENT_REPLY" | "GROUP_PAPER_ADDED";
+            actor: components["schemas"]["UserRef"];
+            /** Format: uuid */
+            groupId: string;
+            groupName: string;
+            paperId: string;
+            paperTitle: string;
+            /** Format: uuid */
+            targetId: string;
+            read: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        UnreadCount: {
+            /** Format: int64 */
+            count: number;
+        };
+        LibraryPage: {
+            items: components["schemas"]["LibraryItemResponse"][];
+            /** Format: int64 */
+            total: number;
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+        };
+        LibraryEntryState: {
+            paperId: string;
+            /** @enum {string} */
+            status: "TO_READ" | "IN_PROGRESS" | "DONE";
+            archived: boolean;
+            /** Format: int32 */
+            lastPage: number;
+        };
+        GroupAnnotation: {
+            annotation: components["schemas"]["AnnotationResponse"];
+            paperTitle: string;
+        };
+        GroupAnnotationPage: {
+            items: components["schemas"]["GroupAnnotation"][];
+            /** Format: int64 */
+            total: number;
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+        };
+        ActivityResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: uuid */
+            groupId: string;
+            /** @enum {string} */
+            type: "PAPER_ADDED" | "COMMENT_POSTED" | "ANNOTATION_ADDED" | "MEMBER_JOINED";
+            actor: components["schemas"]["UserRef"];
+            paperId: string;
+            paperTitle: string;
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            createdAt: string;
+        };
+        SharedCollection: {
+            name: string;
+            description: string;
+            papers: components["schemas"]["PaperSummary"][];
+        };
+        AuthorSummary: {
+            id: string;
+            name: string;
+            affiliations: string[];
+            /** Format: int32 */
+            paperCount: number;
+            /** Format: int32 */
+            citationCount: number;
+            /** Format: int32 */
+            hIndex: number;
+            url: string;
+            homepage: string;
+        };
+        AuthorPapersResponse: {
+            /** Format: int32 */
+            offset: number;
+            /** Format: int32 */
+            next: number;
+            items: components["schemas"]["PaperSummary"][];
+        };
+        AuthorSearchResponse: {
+            /** Format: int32 */
+            total: number;
+            /** Format: int32 */
+            offset: number;
+            /** Format: int32 */
+            limit: number;
+            items: components["schemas"]["AuthorSummary"][];
         };
         UserResponse: {
-            id?: string;
-            name?: string;
-            email?: string;
-            avatarUrl?: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            email: string;
+            avatarUrl: string;
+        };
+        Link: {
+            href: string;
+            templated: boolean;
         };
     };
     responses: never;
@@ -91,6 +1407,682 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryItemResponse"];
+                };
+            };
+        };
+    };
+    remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LibraryItemUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryItemResponse"];
+                };
+            };
+        };
+    };
+    reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionReorderRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionDetail"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": components["schemas"]["StreamingResponseBody"];
+                };
+            };
+        };
+    };
+    upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    removeUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: {
+                groupId?: string;
+                authorId?: string;
+                includeResolved?: boolean;
+            };
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationResponse"][];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnotationCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationResponse"];
+                };
+            };
+        };
+    };
+    unresolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationResponse"];
+                };
+            };
+        };
+    };
+    resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationResponse"];
+                };
+            };
+        };
+    };
+    reply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplyCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplyResponse"];
+                };
+            };
+        };
+    };
+    markRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    markAllRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupSummary"][];
+                };
+            };
+        };
+    };
+    create_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupSummary"];
+                };
+            };
+        };
+    };
+    papers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupPaperResponse"][];
+                };
+            };
+        };
+    };
+    addPaper: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupPaperAddRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupPaperResponse"];
+                };
+            };
+        };
+    };
+    comments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"][];
+                };
+            };
+        };
+    };
+    comment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+        };
+    };
+    members: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberResponse"][];
+                };
+            };
+        };
+    };
+    addMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberAddRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    invites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteResponse"][];
+                };
+            };
+        };
+    };
+    createInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteResponse"];
+                };
+            };
+        };
+    };
+    join: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupSummary"];
+                };
+            };
+        };
+    };
+    list_1: {
+        parameters: {
+            query?: {
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionSummary"][];
+                };
+            };
+        };
+    };
+    create_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionSummary"];
+                };
+            };
+        };
+    };
+    addPaper_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionAddPaperRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionEntry"];
+                };
+            };
+        };
+    };
     logout: {
         parameters: {
             query?: never;
@@ -106,15 +2098,451 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": Record<string, never>;
+                    "application/json": Record<string, never>;
                 };
             };
         };
     };
-    queryCompletion: {
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnotationUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationResponse"];
+                };
+            };
+        };
+    };
+    get_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupSummary"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupSummary"];
+                };
+            };
+        };
+    };
+    removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    changeRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberResponse"];
+                };
+            };
+        };
+    };
+    deleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                commentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentResponse"];
+                };
+            };
+        };
+    };
+    get_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionDetail"];
+                };
+            };
+        };
+    };
+    delete_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionSummary"];
+                };
+            };
+        };
+    };
+    removePaper: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollectionEntryUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionEntry"];
+                };
+            };
+        };
+    };
+    get_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperDetail"];
+                };
+            };
+        };
+    };
+    graph: {
+        parameters: {
+            query?: {
+                direction?: string;
+                depth?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitationGraph"];
+                };
+            };
+        };
+    };
+    expand: {
+        parameters: {
+            query?: {
+                direction?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitationGraph"];
+                };
+            };
+        };
+    };
+    export: {
+        parameters: {
+            query?: {
+                groupId?: string;
+            };
+            header?: never;
+            path: {
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/markdown": string;
+                };
+            };
+        };
+    };
+    search: {
         parameters: {
             query: {
-                query: string;
+                q: string;
+                yearFrom?: number;
+                yearTo?: number;
+                /** @description OpenAlex field ids (e.g. 17 = Computer Science); names contain commas, so ids travel instead */
+                fields?: number[];
+                venue?: string[];
+                minCitations?: number;
+                openAccess?: boolean;
+                types?: string[];
+                sort?: string;
+                offset?: number;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -128,7 +2556,312 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AutoCompleteResponse"];
+                    "application/json": components["schemas"]["PaperSearchResponse"];
+                };
+            };
+        };
+    };
+    autocomplete: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutoCompleteResponse"];
+                };
+            };
+        };
+    };
+    list_2: {
+        parameters: {
+            query?: {
+                unreadOnly?: boolean;
+                before?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationResponse"][];
+                };
+            };
+        };
+    };
+    unreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCount"];
+                };
+            };
+        };
+    };
+    list_3: {
+        parameters: {
+            query?: {
+                status?: "TO_READ" | "IN_PROGRESS" | "DONE";
+                archived?: boolean;
+                sort?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryPage"];
+                };
+            };
+        };
+    };
+    states: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryEntryState"][];
+                };
+            };
+        };
+    };
+    list_4: {
+        parameters: {
+            query?: {
+                includeResolved?: boolean;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupAnnotationPage"];
+                };
+            };
+        };
+    };
+    activity: {
+        parameters: {
+            query?: {
+                actorId?: string;
+                paperId?: string;
+                before?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityResponse"][];
+                };
+            };
+        };
+    };
+    myActivity: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityResponse"][];
+                };
+            };
+        };
+    };
+    export_1: {
+        parameters: {
+            query: {
+                format: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/x-bibtex": string;
+                    "text/markdown": string;
+                };
+            };
+        };
+    };
+    shared: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SharedCollection"];
+                };
+            };
+        };
+    };
+    get_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                authorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorSummary"];
+                };
+            };
+        };
+    };
+    papers_1: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                authorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorPapersResponse"];
+                };
+            };
+        };
+    };
+    search_1: {
+        parameters: {
+            query: {
+                q: string;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorSearchResponse"];
                 };
             };
         };
@@ -148,8 +2881,128 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["UserResponse"];
                 };
+            };
+        };
+    };
+    links: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.spring-boot.actuator.v3+json": {
+                        [key: string]: {
+                            [key: string]: components["schemas"]["Link"];
+                        };
+                    };
+                    "application/vnd.spring-boot.actuator.v2+json": {
+                        [key: string]: {
+                            [key: string]: components["schemas"]["Link"];
+                        };
+                    };
+                    "application/json": {
+                        [key: string]: {
+                            [key: string]: components["schemas"]["Link"];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    health: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.spring-boot.actuator.v3+json": Record<string, never>;
+                    "application/vnd.spring-boot.actuator.v2+json": Record<string, never>;
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    deleteReply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paperId: string;
+                id: string;
+                replyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    removePaper_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                paperId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    revokeInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+                inviteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

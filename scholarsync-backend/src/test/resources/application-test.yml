@@ -1,0 +1,52 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 4KB
+      max-request-size: 5KB
+  datasource:
+    url: set-by-E2ETestBase
+    username: set-by-E2ETestBase
+    password: set-by-E2ETestBase
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+
+external:
+  # base URLs are set by E2ETestBase (one WireMock server, one path prefix per source)
+  contact-email: tests@example.com
+  throttle: false
+  retry-backoff-ms: 5
+  openalex:
+    api-key: test-openalex-key
+  unpaywall:
+    enabled: false
+
+search:
+  depth: 10
+  source-timeout: 2s
+  cache:
+    # never runs during tests
+    cleanup-cron: "-"
+    hit-flush-interval: 1h
+
+jwt:
+  secret: test-secret-test-secret-test-secret-test-secret-0123456789
+  issuer-url: http://localhost
+  expiration-ms: 3600000
+  frontend-url: http://localhost:6969
+  secure-cookie: false
+
+storage:
+  endpoint: set-by-E2ETestBase
+  access-key: set-by-E2ETestBase
+  secret-key: set-by-E2ETestBase
+  bucket: test-pdfs
+
+pdf:
+  max-bytes: 2048
+  # the fake publisher is WireMock on localhost
+  allow-private-hosts: true

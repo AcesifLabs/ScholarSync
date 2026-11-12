@@ -7,27 +7,60 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scholarsync-frontend
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Install pnpm (version from package.json "packageManager")
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: scholarsync-frontend/package.json
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: 8
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: scholarsync-frontend/pnpm-lock.yaml
 
-    - name: Install dependencies
-      run: pnpm install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    - name: Lint
-      run: pnpm lint
+      - name: Lint
+        run: pnpm lint
 
-    - name: Build
-      run: pnpm build
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scholarsync-backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # E2E tests start Postgres and MinIO with Testcontainers; ubuntu runners ship Docker.
+      - name: Test
+        run: ./gradlew test --no-daemon

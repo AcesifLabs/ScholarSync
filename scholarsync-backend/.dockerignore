@@ -1,0 +1,7 @@
+build
+.gradle
+.idea
+.env*
+!.env.example
+infra
+*.log

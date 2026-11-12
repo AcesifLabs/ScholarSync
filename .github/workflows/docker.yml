@@ -32,9 +32,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./scholarsync-backend
+          file: ./scholarsync-backend/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/scholarsync-app:latest
           cache-from: type=gha,mode=max

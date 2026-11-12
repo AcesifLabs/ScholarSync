@@ -1,0 +1,573 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T15:09:34.605995+00:00",
+  "title": "Design System: ScholarSync",
+  "extensions": {
+    "colorMeta": {
+      "ink-indigo": {
+        "role": "primary",
+        "displayName": "Ink Indigo",
+        "canonical": "oklch(0.47 0.17 272)",
+        "dark": "oklch(0.73 0.13 274)",
+        "cssVar": "--primary",
+        "tonalRamp": [
+          "oklch(0.15 0.071 272)",
+          "oklch(0.27 0.101 272)",
+          "oklch(0.39 0.13 272)",
+          "oklch(0.51 0.16 272)",
+          "oklch(0.63 0.15 272)",
+          "oklch(0.75 0.121 272)",
+          "oklch(0.86 0.093 272)",
+          "oklch(0.95 0.071 272)"
+        ]
+      },
+      "ink-indigo-foreground": {
+        "role": "primary",
+        "displayName": "On Indigo",
+        "canonical": "oklch(0.99 0 0)",
+        "dark": "oklch(0.18 0.03 274)",
+        "cssVar": "--primary-foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0 272)",
+          "oklch(0.27 0.0 272)",
+          "oklch(0.39 0.0 272)",
+          "oklch(0.51 0.0 272)",
+          "oklch(0.63 0.0 272)",
+          "oklch(0.75 0.0 272)",
+          "oklch(0.86 0.0 272)",
+          "oklch(0.95 0.0 272)"
+        ]
+      },
+      "focus-indigo": {
+        "role": "primary",
+        "displayName": "Focus Indigo",
+        "canonical": "oklch(0.55 0.17 272)",
+        "dark": "oklch(0.66 0.14 274)",
+        "cssVar": "--ring",
+        "tonalRamp": [
+          "oklch(0.15 0.071 272)",
+          "oklch(0.27 0.101 272)",
+          "oklch(0.39 0.13 272)",
+          "oklch(0.51 0.16 272)",
+          "oklch(0.63 0.15 272)",
+          "oklch(0.75 0.121 272)",
+          "oklch(0.86 0.093 272)",
+          "oklch(0.95 0.071 272)"
+        ]
+      },
+      "cool-paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "oklch(0.993 0.002 265)",
+        "dark": "oklch(0.175 0.008 268)",
+        "cssVar": "--background",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "chrome-surface": {
+        "role": "neutral",
+        "displayName": "Chrome Surface",
+        "canonical": "oklch(0.975 0.004 265)",
+        "dark": "oklch(0.155 0.008 268)",
+        "cssVar": "--surface",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "card-white": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "oklch(1 0 0)",
+        "dark": "oklch(0.205 0.01 268)",
+        "cssVar": "--card",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "slate-ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "oklch(0.21 0.02 268)",
+        "dark": "oklch(0.95 0.005 268)",
+        "cssVar": "--foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.008 268)",
+          "oklch(0.27 0.012 268)",
+          "oklch(0.39 0.015 268)",
+          "oklch(0.51 0.019 268)",
+          "oklch(0.63 0.018 268)",
+          "oklch(0.75 0.014 268)",
+          "oklch(0.86 0.011 268)",
+          "oklch(0.95 0.008 268)"
+        ]
+      },
+      "muted-slate": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "oklch(0.5 0.02 265)",
+        "dark": "oklch(0.72 0.015 268)",
+        "cssVar": "--muted-foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.008 265)",
+          "oklch(0.27 0.012 265)",
+          "oklch(0.39 0.015 265)",
+          "oklch(0.51 0.019 265)",
+          "oklch(0.63 0.018 265)",
+          "oklch(0.75 0.014 265)",
+          "oklch(0.86 0.011 265)",
+          "oklch(0.95 0.008 265)"
+        ]
+      },
+      "quiet-fill": {
+        "role": "neutral",
+        "displayName": "Quiet Fill",
+        "canonical": "oklch(0.962 0.006 265)",
+        "dark": "oklch(0.24 0.011 268)",
+        "cssVar": "--muted",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "secondary-fill": {
+        "role": "neutral",
+        "displayName": "Secondary Fill",
+        "canonical": "oklch(0.955 0.007 265)",
+        "dark": "oklch(0.26 0.012 268)",
+        "cssVar": "--secondary",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "selected-fill": {
+        "role": "neutral",
+        "displayName": "Selected Fill",
+        "canonical": "oklch(0.948 0.01 268)",
+        "dark": "oklch(0.28 0.016 270)",
+        "cssVar": "--accent",
+        "tonalRamp": [
+          "oklch(0.15 0.006 268)",
+          "oklch(0.27 0.009 268)",
+          "oklch(0.39 0.012 268)",
+          "oklch(0.51 0.014 268)",
+          "oklch(0.63 0.013 268)",
+          "oklch(0.75 0.011 268)",
+          "oklch(0.86 0.008 268)",
+          "oklch(0.95 0.006 268)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.91 0.006 265)",
+        "dark": "oklch(0.3 0.012 268)",
+        "cssVar": "--border",
+        "tonalRamp": [
+          "oklch(0.15 0.004 265)",
+          "oklch(0.27 0.006 265)",
+          "oklch(0.39 0.008 265)",
+          "oklch(0.51 0.009 265)",
+          "oklch(0.63 0.009 265)",
+          "oklch(0.75 0.007 265)",
+          "oklch(0.86 0.005 265)",
+          "oklch(0.95 0.004 265)"
+        ]
+      },
+      "control-outline": {
+        "role": "neutral",
+        "displayName": "Control Outline",
+        "canonical": "oklch(0.64 0.015 265)",
+        "dark": "oklch(0.52 0.016 268)",
+        "cssVar": "--input",
+        "tonalRamp": [
+          "oklch(0.15 0.006 265)",
+          "oklch(0.27 0.009 265)",
+          "oklch(0.39 0.012 265)",
+          "oklch(0.51 0.014 265)",
+          "oklch(0.63 0.013 265)",
+          "oklch(0.75 0.011 265)",
+          "oklch(0.86 0.008 265)",
+          "oklch(0.95 0.006 265)"
+        ]
+      },
+      "recent-wash": {
+        "role": "neutral",
+        "displayName": "Recent Wash",
+        "canonical": "oklch(0.96 0.03 272)",
+        "dark": "oklch(0.27 0.04 274)",
+        "cssVar": "--highlight",
+        "tonalRamp": [
+          "oklch(0.15 0.017 272)",
+          "oklch(0.27 0.024 272)",
+          "oklch(0.39 0.031 272)",
+          "oklch(0.51 0.038 272)",
+          "oklch(0.63 0.035 272)",
+          "oklch(0.75 0.028 272)",
+          "oklch(0.86 0.022 272)",
+          "oklch(0.95 0.017 272)"
+        ]
+      },
+      "open-green": {
+        "role": "semantic",
+        "displayName": "Open Green",
+        "canonical": "oklch(0.5 0.13 150)",
+        "dark": "oklch(0.72 0.14 150)",
+        "cssVar": "--success",
+        "tonalRamp": [
+          "oklch(0.15 0.054 150)",
+          "oklch(0.27 0.077 150)",
+          "oklch(0.39 0.1 150)",
+          "oklch(0.51 0.122 150)",
+          "oklch(0.63 0.115 150)",
+          "oklch(0.75 0.092 150)",
+          "oklch(0.86 0.071 150)",
+          "oklch(0.95 0.054 150)"
+        ]
+      },
+      "danger-red": {
+        "role": "semantic",
+        "displayName": "Danger Red",
+        "canonical": "oklch(0.53 0.2 27)",
+        "dark": "oklch(0.7 0.17 25)",
+        "cssVar": "--destructive",
+        "tonalRamp": [
+          "oklch(0.15 0.084 27)",
+          "oklch(0.27 0.119 27)",
+          "oklch(0.39 0.153 27)",
+          "oklch(0.51 0.188 27)",
+          "oklch(0.63 0.177 27)",
+          "oklch(0.75 0.142 27)",
+          "oklch(0.86 0.11 27)",
+          "oklch(0.95 0.084 27)"
+        ]
+      },
+      "highlight-key-claim": {
+        "role": "semantic",
+        "displayName": "Key claim",
+        "canonical": "oklch(0.88 0.17 95 / 0.42)",
+        "dark": "oklch(0.88 0.17 95 / 0.5)",
+        "cssVar": "--highlight-yellow",
+        "tonalRamp": [
+          "oklch(0.15 0.071 95)",
+          "oklch(0.27 0.101 95)",
+          "oklch(0.39 0.13 95)",
+          "oklch(0.51 0.16 95)",
+          "oklch(0.63 0.15 95)",
+          "oklch(0.75 0.121 95)",
+          "oklch(0.86 0.093 95)",
+          "oklch(0.95 0.071 95)"
+        ]
+      },
+      "highlight-evidence": {
+        "role": "semantic",
+        "displayName": "Evidence",
+        "canonical": "oklch(0.84 0.15 150 / 0.4)",
+        "dark": "oklch(0.84 0.15 150 / 0.5)",
+        "cssVar": "--highlight-green",
+        "tonalRamp": [
+          "oklch(0.15 0.063 150)",
+          "oklch(0.27 0.089 150)",
+          "oklch(0.39 0.115 150)",
+          "oklch(0.51 0.141 150)",
+          "oklch(0.63 0.133 150)",
+          "oklch(0.75 0.106 150)",
+          "oklch(0.86 0.082 150)",
+          "oklch(0.95 0.063 150)"
+        ]
+      },
+      "highlight-disagreement": {
+        "role": "semantic",
+        "displayName": "Disagreement",
+        "canonical": "oklch(0.74 0.16 25 / 0.38)",
+        "dark": "oklch(0.74 0.16 25 / 0.48)",
+        "cssVar": "--highlight-red",
+        "tonalRamp": [
+          "oklch(0.15 0.067 25)",
+          "oklch(0.27 0.095 25)",
+          "oklch(0.39 0.123 25)",
+          "oklch(0.51 0.151 25)",
+          "oklch(0.63 0.141 25)",
+          "oklch(0.75 0.113 25)",
+          "oklch(0.86 0.088 25)",
+          "oklch(0.95 0.067 25)"
+        ]
+      },
+      "highlight-question": {
+        "role": "semantic",
+        "displayName": "Question",
+        "canonical": "oklch(0.78 0.11 250 / 0.4)",
+        "dark": "oklch(0.78 0.11 250 / 0.5)",
+        "cssVar": "--highlight-blue",
+        "tonalRamp": [
+          "oklch(0.15 0.046 250)",
+          "oklch(0.27 0.065 250)",
+          "oklch(0.39 0.084 250)",
+          "oklch(0.51 0.104 250)",
+          "oklch(0.63 0.097 250)",
+          "oklch(0.75 0.078 250)",
+          "oklch(0.86 0.06 250)",
+          "oklch(0.95 0.046 250)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing statement only; 2.25rem mobile, 3rem from md, max 18ch."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles; a paper's own title goes to 1.75rem on desktop, max 40ch."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Paper titles in list rows."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default UI text; tabular figures, cv11 and ss03."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Abstracts, notes, discussion, annotation comments; max 66ch via the .reading utility."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata lines, sidebar section labels, stat captions, chips; sentence case."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Menus, search suggestions, highlight popover, sheets, a dragged row."
+      },
+      {
+        "name": "overlay-panel",
+        "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "purpose": "Reader annotation panel when it overlays the page."
+      },
+      {
+        "name": "paper",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1), 0 0 0 1px rgb(0 0 0 / 0.1)",
+        "purpose": "PDF pages (always on white) and the selected segmented-control thumb (without the ring)."
+      }
+    ],
+    "focus": {
+      "value": "outline: 2px solid var(--ring); outline-offset: 2px",
+      "scope": "Global :focus-visible; composite fields (search) move it to the shell as border + 2px ring."
+    },
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms ease (Tailwind transition-colors / transition-all defaults)",
+        "purpose": "Hover and selection colour changes."
+      },
+      {
+        "name": "enter-exit",
+        "value": "tw-animate-css fade + slide/zoom",
+        "purpose": "Popovers, dialogs, sheets."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "enter/exit scale, translate and rotate forced to identity; fades kept",
+        "purpose": "The fade carries the state change."
+      },
+      {
+        "name": "undo-window",
+        "value": "5000ms",
+        "purpose": "Deferred commit for reversible removals, shown as a toast with Undo."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "layout": {
+      "topBar": "48px",
+      "sidebar": "224px, collapses to 56px",
+      "content": "max 72rem, 16px gutter mobile, 32px from md"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action on a screen: Read PDF, Search, the landing CTA.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/></svg>Read PDF</button>",
+      "css": ".ds-btn-primary{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid transparent;border-radius:var(--radius,6px);background:var(--primary);color:var(--primary-foreground);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Row-level and secondary actions, including Read on list rows.",
+      "html": "<button class=\"ds-btn-outline\">Read</button>",
+      "css": ".ds-btn-outline{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius,6px);background:var(--background);color:var(--foreground);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}.ds-btn-outline:hover{background:var(--muted)}.ds-btn-outline:active{transform:translateY(1px)}.ds-btn-outline:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Toolbar icons, menu triggers and quiet secondary links.",
+      "html": "<button class=\"ds-btn-ghost\">Search without an account</button>",
+      "css": ".ds-btn-ghost{font-family: Inter, ui-sans-serif, system-ui, sans-serif;height:36px;padding:0 10px;border:1px solid transparent;border-radius:var(--radius,6px);background:transparent;color:var(--foreground);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}.ds-btn-ghost:hover{background:var(--muted)}.ds-btn-ghost:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Composite search shell; the shell takes the focus ring so it wraps the icon.",
+      "html": "<form class=\"ds-search\" role=\"search\" onsubmit=\"return false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input placeholder=\"Search papers\" aria-label=\"Search papers\"></form>",
+      "css": ".ds-search{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:flex;align-items:center;gap:8px;width:320px;height:36px;padding:0 12px;border:1px solid var(--input);border-radius:var(--radius,6px);background:var(--background);color:var(--muted-foreground)}.ds-search:focus-within{border-color:var(--ring);box-shadow:0 0 0 2px var(--ring)}.ds-search input{flex:1;border:0;background:transparent;font:inherit;font-size:14px;color:var(--foreground);outline:none}.ds-search input::placeholder{color:var(--muted-foreground)}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Subject and source labels; not interactive filters.",
+      "html": "<span class=\"ds-chip\">Computer Science</span>",
+      "css": ".ds-chip{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:inline-flex;align-items:center;height:20px;padding:2px 8px;border-radius:9999px;background:var(--secondary);color:var(--secondary-foreground,var(--foreground));font-size:12px;font-weight:500}"
+    },
+    {
+      "name": "Sidebar Nav",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sectioned sidebar; active item gets Selected Fill and an indigo icon.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><p>Your work</p><a href=\"#\" aria-current=\"page\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 4v16M8 4v16M12 4l4 16\"/></svg>Library</a><a href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M3 7h6l2 2h10v10H3z\"/></svg>Collections</a></nav>",
+      "css": ".ds-nav{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:flex;flex-direction:column;gap:2px;width:208px;padding:8px;background:var(--surface)}.ds-nav p{margin:0;padding:0 10px 4px;font-size:12px;font-weight:500;color:var(--muted-foreground)}.ds-nav a{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:calc(var(--radius,6px)*.8);font-size:14px;color:color-mix(in oklch,var(--foreground) 75%,transparent);text-decoration:none;transition:background .15s}.ds-nav a:hover{background:color-mix(in oklch,var(--accent) 70%,transparent);color:var(--foreground)}.ds-nav a[aria-current=page]{background:var(--accent);color:var(--foreground);font-weight:500}.ds-nav a[aria-current=page] svg{color:var(--primary)}.ds-nav a:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Paper Row List",
+      "kind": "custom",
+      "refersTo": "paper-row",
+      "description": "Signature hairline-divided list of paper rows with tabular metadata.",
+      "html": "<div class=\"ds-paper-list\"><article><h3><a href=\"#\">Attention Is All You Need</a></h3><p class=\"a\">Ashish Vaswani, Noam Shazeer, Niki Parmar et al.</p><p class=\"m\"><span>2017</span><span>NeurIPS</span><span>202,480 citations</span><span class=\"ok\">PDF</span><span>via OpenAlex, Crossref, arXiv</span></p><div><button class=\"r\">Read</button></div></article><article><h3><a href=\"#\">Neural Machine Translation by Jointly Learning to Align and Translate</a></h3><p class=\"a\">Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio</p><p class=\"m\"><span>2014</span><span>ICLR</span><span>38,112 citations</span><span class=\"ok\">Open access</span></p></article></div>",
+      "css": ".ds-paper-list{font-family: Inter, ui-sans-serif, system-ui, sans-serif;display:flex;flex-direction:column;border-top:1px solid var(--border);border-bottom:1px solid var(--border);color:var(--foreground);font-variant-numeric:tabular-nums}.ds-paper-list article{display:flex;flex-direction:column;gap:6px;padding:16px 0}.ds-paper-list article+article{border-top:1px solid var(--border)}.ds-paper-list h3{margin:0;font-size:16px;font-weight:600;line-height:1.375}.ds-paper-list h3 a{color:inherit;text-decoration:none}.ds-paper-list h3 a:hover{color:var(--primary);text-decoration:underline}.ds-paper-list .a{margin:0;font-size:14px;color:color-mix(in oklch,var(--foreground) 80%,transparent)}.ds-paper-list .m{margin:0;display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12px;color:var(--muted-foreground)}.ds-paper-list .ok{color:var(--success);font-weight:500}.ds-paper-list .r{height:28px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius,6px);background:var(--background);color:var(--foreground);font:500 13px/1 Inter,system-ui,sans-serif;cursor:pointer}.ds-paper-list .r:hover{background:var(--muted)}.ds-paper-list a:focus-visible,.ds-paper-list .r:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Reading Text with Highlight",
+      "kind": "custom",
+      "refersTo": "surface-pane",
+      "description": "Serif reading text at 66ch with a meaning-coded annotation highlight.",
+      "html": "<div class=\"ds-reading-pane\"><p class=\"ds-reading\">…we propose the Transformer, <mark>a model architecture eschewing recurrence and instead relying entirely on an attention mechanism</mark> to draw global dependencies…</p><p class=\"ds-note\"><strong>Key claim</strong> · <span>Compare with the complexity table in section 4.</span></p></div>",
+      "css": ".ds-reading-pane{display:flex;flex-direction:column;gap:8px;max-width:26rem;padding:16px;border:1px solid var(--border);border-radius:calc(var(--radius,6px)*1.4);background:var(--card)}.ds-reading{margin:0;font-family:'Source Serif 4',ui-serif,Georgia,serif;font-size:17px;line-height:1.6;max-width:66ch;color:var(--foreground)}.ds-reading mark{background:var(--highlight-yellow);color:inherit;border-radius:3px;padding:0 2px}.ds-note{margin:0;font:14px Inter,system-ui,sans-serif;color:var(--foreground)}.ds-note strong{font-weight:500}.ds-note span{color:var(--muted-foreground)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Instrument",
+    "overview": "ScholarSync is a precise research tool in the register of Linear, Semantic Scholar, Readwise Reader and Zotero 7. The interface stays out of the way of the papers: cool neutrals tinted toward one hue (about 265), one ink-indigo accent that marks only the primary action, Inter for the working interface and Source Serif 4 for anything meant to be read. Density is desktop-first and calm: a 48px top bar, a collapsible icon sidebar, and content laid out as hairline-divided lists with tabular metadata.\n\nNothing is ornamental. Depth is flat at rest, structure comes from 1px hairlines, and color carries meaning wherever it appears: indigo means \"the main thing to do here\", green means \"openly available\", the four highlight colours mean the same thing to every reader in a group. The PDF page is the one piece of real paper in the app and stays white in both themes.\n\nThe world rejects the stock SaaS look: no hero illustration, no grids of icon-tile cards, no decorative gradients. Light and dark themes are both first-class and are defined from the same hue.",
+    "keyCharacteristics": [
+      "One hue (about 265) tints every neutral in both themes.",
+      "Ink-indigo appears only on primary actions, selection, caret and focus.",
+      "Hairline-divided lists, not bordered cards, for collections of records.",
+      "Inter with tabular figures for UI; Source Serif 4 at 66ch for reading.",
+      "6px controls, about 8px surfaces, one focus ring.",
+      "Flat at rest; shadows only on layers that float."
+    ],
+    "rules": [
+      {
+        "name": "The One Voice Rule",
+        "body": "Ink Indigo fills at most the one primary action on a screen (Read PDF, Search, the landing CTA). Row-level actions such as \"Read\" are outline buttons, even when there are many of them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Colour Means Something Rule",
+        "body": "Every non-neutral colour carries a fixed meaning: indigo is the primary action, green is open availability or success, red is destruction or error, and the four highlight colours are Key claim, Evidence, Disagreement and Question. Never pick a colour for decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Borders Rule",
+        "body": "Hairline separates content and may be faint. Control Outline marks an interactive boundary and must reach 3:1.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Sans for operating, serif for reading. Any long-form text a person reads for meaning uses the reading style at 66ch; nothing else uses the serif.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "UI numbers are tabular by default; only reading text switches to proportional figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-At-Rest Rule",
+        "body": "If it does not float, it does not cast a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Paper Stays White Rule",
+        "body": "PDF pages render on pure white in both themes; the dark theme darkens the chrome around the page, never the page.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** reserve the Ink Indigo fill for the one primary action on a screen: Read PDF, Search, the landing CTA.",
+      "**Do** make row-level actions outline buttons, even \"Read\".",
+      "**Do** present collections of records as hairline-divided lists with 16px row padding.",
+      "**Do** set every long-form text a person reads in the reading style: Source Serif 4, 1.0625rem, 1.6, max 66ch.",
+      "**Do** rely on the single global focus ring (2px Focus Indigo, 2px offset); on a composite field, move it to the shell.",
+      "**Do** use 6px corners on controls and about 8px on surfaces.",
+      "**Do** keep PDF pages white in dark mode.",
+      "**Do** label annotation colours by their meaning: Key claim, Evidence, Disagreement, Question.",
+      "**Do** give reversible removals an Undo toast with a 5-second deferred commit.",
+      "**Do** keep fades and drop slides and zooms when reduced motion is requested."
+    ],
+    "donts": [
+      "**Don't** fill row-level or secondary actions with indigo.",
+      "**Don't** wrap repeated list items in bordered or shadowed cards.",
+      "**Don't** add a focus ring or glow inside a primitive; the global rule owns focus.",
+      "**Don't** use a highlight colour for anything except its meaning.",
+      "**Don't** add shadows to surfaces that do not float.",
+      "**Don't** use the serif for UI labels, buttons or metadata.",
+      "**Don't** use Hairline for control borders; controls need Control Outline at 3:1."
+    ]
+  }
+}

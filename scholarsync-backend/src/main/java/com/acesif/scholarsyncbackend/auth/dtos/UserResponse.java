@@ -1,3 +1,5 @@
 package com.acesif.scholarsyncbackend.auth.dtos;
 
-public record UserResponse(String id, String name, String email, String avatarUrl) {}
+import java.util.UUID;
+
+public record UserResponse(UUID id, String name, String email, String avatarUrl) {}

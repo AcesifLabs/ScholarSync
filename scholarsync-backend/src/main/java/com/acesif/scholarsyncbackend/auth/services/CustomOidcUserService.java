@@ -1,6 +1,6 @@
 package com.acesif.scholarsyncbackend.auth.services;
 
-import com.acesif.scholarsyncbackend.auth.dtos.CustomOidcUser;
+import com.acesif.scholarsyncbackend.auth.principals.CustomOidcUser;
 import com.acesif.scholarsyncbackend.users.entities.User;
 import com.acesif.scholarsyncbackend.users.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,21 +16,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
 
-    private final UserRepository userRepository;
-    private final OAuthService oAuthService;
+  private final UserRepository userRepository;
+  private final OAuthService oAuthService;
 
-    @Override
-    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        OidcUser oidcUser = super.loadUser(userRequest);
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        Map<String, Object> attributes = oidcUser.getAttributes();
+  @Override
+  public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+    OidcUser oidcUser = super.loadUser(userRequest);
+    String registrationId = userRequest.getClientRegistration().getRegistrationId();
+    Map<String, Object> attributes = oidcUser.getAttributes();
 
-        User user = switch (registrationId) {
-            case "google" -> oAuthService.handleGoogleUser(attributes);
-            case "orcid" -> oAuthService.handleOrcidUser(attributes);
-            default -> throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
-        };
+    User user = switch (registrationId) {
+      case "google" -> oAuthService.handleGoogleUser(attributes);
+      default -> throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
+    };
 
-        return new CustomOidcUser(oidcUser, user.getId());
-    }
+    return new CustomOidcUser(oidcUser, user.getId());
+  }
 }
