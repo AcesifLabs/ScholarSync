@@ -5,10 +5,14 @@ import com.acesif.scholarsyncbackend.auth.handlers.OAuth2FailureHandler;
 import com.acesif.scholarsyncbackend.auth.handlers.OAuth2SuccessHandler;
 import com.acesif.scholarsyncbackend.auth.services.CustomOidcUserService;
 import com.acesif.scholarsyncbackend.auth.services.OAuthService;
-import com.acesif.scholarsyncbackend.commons.config.properties.JsonWebToken;
+import com.acesif.scholarsyncbackend.commons.config.properties.JwtProperties;
+import com.acesif.scholarsyncbackend.commons.constants.ApiPaths;
 import com.acesif.scholarsyncbackend.commons.filters.JwtAuthFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,7 +35,18 @@ public class SecurityConfig {
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
   private final OAuth2FailureHandler oAuth2FailureHandler;
   private final JwtAuthFilter jwtAuthFilter;
-  private final JsonWebToken jwtConfig;
+  private final JwtProperties jwtConfig;
+
+  @Value("${springdoc.api-docs.path}")
+  private String apiDocsPath;
+
+  @Value("${springdoc.swagger-ui.path}")
+  private String swaggerUiPath;
+
+  // Turns a mapping such as /papers/{paperId}/graph into the matcher pattern /papers/*/graph
+  private static String pattern(String mapping) {
+    return mapping.replaceAll("\\{[^/}]+}", "*");
+  }
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,14 +57,27 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(auth -> auth
+                    // Streaming responses (PDFs) finish on an ASYNC dispatch that the JWT filter skips; the original
+                    // REQUEST dispatch was already authorized, so don't re-check (it would see an anonymous user).
+                    .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                     .requestMatchers(
                             "/login/**",
                             "/oauth2/**",
-                            "/api/v1/auth/**",
+                            ApiPaths.Auth.BASE + "/**",
                             "/swagger-ui/**",
-                            "/swagger-ui.html",
+                            swaggerUiPath,
                             "/v3/api-docs/**",
-                            "/api-docs/**"
+                            apiDocsPath + "/**"
+                    ).permitAll()
+                    // Public discovery: search, paper detail, citation graph, authors
+                    .requestMatchers(HttpMethod.GET,
+                            ApiPaths.Papers.BASE + ApiPaths.Papers.SEARCH,
+                            ApiPaths.Papers.BASE + ApiPaths.Papers.AUTOCOMPLETE,
+                            pattern(ApiPaths.Papers.BASE + ApiPaths.Papers.BY_ID),
+                            pattern(ApiPaths.Papers.GRAPH),
+                            pattern(ApiPaths.Papers.GRAPH + ApiPaths.Papers.GRAPH_EXPAND),
+                            pattern(ApiPaths.Collections.BASE + ApiPaths.Collections.SHARED),
+                            ApiPaths.Authors.BASE + "/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             )
@@ -58,9 +86,9 @@ public class SecurityConfig {
 
             .oauth2Login(oauth2 -> oauth2
                     .authorizationEndpoint(endpoint ->
-                            endpoint.baseUri("/oauth2/authorize"))
+                            endpoint.baseUri(ApiPaths.OAuth2.AUTHORIZATION))
                     .redirectionEndpoint(endpoint ->
-                            endpoint.baseUri("/login/oauth2/code/*"))
+                            endpoint.baseUri(ApiPaths.OAuth2.REDIRECTION))
                     .userInfoEndpoint(userInfo -> userInfo
                             .userService(customOAuth2UserService)
                             .oidcUserService(customOidcUserService))
@@ -68,7 +96,6 @@ public class SecurityConfig {
                     .failureHandler(oAuth2FailureHandler)
             )
 
-            // Add JWT filter before Spring's auth filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
@@ -78,7 +105,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(jwtConfig.getFrontendUrl()));
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
     config.setMaxAge(3600L);

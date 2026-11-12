@@ -1,11 +1,12 @@
 package com.acesif.scholarsyncbackend.users.entities;
 
-import com.acesif.scholarsyncbackend.users.enums.EAuthProvider;
+import com.acesif.scholarsyncbackend.users.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -18,13 +19,10 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private String id;
+  private UUID id;
 
   @Column(unique = true)
   private String googleId;
-
-  @Column(unique = true)
-  private String orcidId;
 
   @Column(nullable = false, unique = true)
   private String email;
@@ -33,7 +31,7 @@ public class User {
   private String avatarUrl;
 
   @Enumerated(EnumType.STRING)
-  private EAuthProvider primaryProvider;
+  private AuthProvider primaryProvider;
 
   @CreationTimestamp
   @Column(nullable = false, updatable = false)

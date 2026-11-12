@@ -1,30 +1,18 @@
 'use client';
 
 import { createContext, useContext, ReactNode } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchCurrentUser, logoutRequest } from '@/app/api/auth';
-import { AUTH_QUERY_KEY, AUTH_STALE_TIME } from './AuthProvider.constants';
-import { AuthContextType } from './AuthProvider.types';
+import { useCurrentUser, useLogout } from '@/app/api/auth';
+import type { AuthContextType } from '@/app/lib/types/auth.types';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const queryClient = useQueryClient();
-
-  const { data: user, isLoading } = useQuery({
-    queryKey: AUTH_QUERY_KEY,
-    queryFn: fetchCurrentUser,
-    staleTime: AUTH_STALE_TIME,
-    retry: false,
-  });
-
-  const logout = async () => {
-    await logoutRequest();
-    queryClient.setQueryData(AUTH_QUERY_KEY, null);
-  };
+  // Retries follow the TanStackProvider default: network/5xx a few times, never a 4xx (signed out is not an error)
+  const { data: user, isLoading, error, refetch } = useCurrentUser();
+  const logout = useLogout();
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, error, retry: () => void refetch(), logout: async () => { await logout.mutateAsync(); } }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,6 @@
 package com.acesif.scholarsyncbackend.auth.handlers;
 
-import com.acesif.scholarsyncbackend.commons.config.properties.JsonWebToken;
+import com.acesif.scholarsyncbackend.commons.config.properties.JwtProperties;
 import jakarta.servlet.http.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-  private final JsonWebToken jwtConfig;
+  private final JwtProperties jwtConfig;
 
   @Override
   public void onAuthenticationFailure(
@@ -27,7 +27,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
     String errorMessage = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
     getRedirectStrategy().sendRedirect(
             request, response,
-            jwtConfig.getFrontendUrl() + "/auth/error?reason=" + errorMessage
+            jwtConfig.getFrontendUrl() + jwtConfig.getErrorPath() + "?reason=" + errorMessage
     );
   }
 }

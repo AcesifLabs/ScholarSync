@@ -1,8 +1,6 @@
 package com.acesif.scholarsyncbackend.auth.services;
 
-import com.acesif.scholarsyncbackend.auth.dtos.UserDTO;
-import com.acesif.scholarsyncbackend.commons.config.properties.JsonWebToken;
-import com.acesif.scholarsyncbackend.users.repositories.UserRepository;
+import com.acesif.scholarsyncbackend.commons.config.properties.JwtProperties;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -11,39 +9,38 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtService {
 
-  private final JsonWebToken jwtProperties;
-  private final UserRepository userRepository;
+  private final JwtProperties jwtProperties;
   private final SecretKey key;
 
-  public JwtService(JsonWebToken jwtProperties, UserRepository userRepository) {
+  public JwtService(JwtProperties jwtProperties) {
     this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     this.jwtProperties = jwtProperties;
-    this.userRepository = userRepository;
   }
 
-  public String generateToken(String userId) {
-    long expirationMillis = Long.parseLong(jwtProperties.getExpirationMs());
+  public String generateToken(UUID userId) {
+    long expirationMillis = jwtProperties.getExpirationMs();
     Date expiration = new Date(System.currentTimeMillis() + expirationMillis);
 
     return Jwts.builder()
             .signWith(key)
-            .subject(userId)
+            .subject(userId.toString())
             .issuedAt(new Date())
             .expiration(expiration)
             .compact();
   }
 
-  public String extractUserId(String token) {
-    return Jwts.parser()
+  public UUID extractUserId(String token) {
+    return UUID.fromString(Jwts.parser()
             .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .getPayload()
-            .getSubject();
+            .getSubject());
   }
 
   public boolean isValid(String token) {
@@ -58,17 +55,4 @@ public class JwtService {
     }
   }
 
-  public UserDTO getUserFromToken(String token) {
-    String userId = extractUserId(token);
-    return userRepository.findById(userId)
-            .map(user -> new UserDTO(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getName(),
-                    user.getAvatarUrl(),
-                    user.getPrimaryProvider().name(),
-                    user.getOrcidId()
-            ))
-            .orElseThrow(() -> new RuntimeException("User not found"));
-  }
 }

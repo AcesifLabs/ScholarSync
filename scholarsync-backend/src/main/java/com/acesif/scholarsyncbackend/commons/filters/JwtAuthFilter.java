@@ -1,9 +1,8 @@
 package com.acesif.scholarsyncbackend.commons.filters;
 
 import com.acesif.scholarsyncbackend.auth.services.JwtService;
-import com.acesif.scholarsyncbackend.users.entities.User;
-import com.acesif.scholarsyncbackend.users.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
+import com.acesif.scholarsyncbackend.commons.utils.AuthCookies;
+import com.acesif.scholarsyncbackend.users.services.UserCache;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -20,13 +18,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
-  private final UserRepository userRepository;
+  private final UserCache userCache;
 
   @Override
   protected void doFilterInternal(
@@ -38,7 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     String token = null;
     if (request.getCookies() != null) {
       for (Cookie cookie : request.getCookies()) {
-        if ("auth_token".equals(cookie.getName())) {
+        if (AuthCookies.NAME.equals(cookie.getName())) {
           token = cookie.getValue();
           break;
         }
@@ -46,9 +45,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     if (token != null && jwtService.isValid(token)) {
-      String userId = jwtService.extractUserId(token);
+      UUID userId;
+      try {
+        userId = jwtService.extractUserId(token);
+      } catch (IllegalArgumentException e) {
+        userId = null; // signed token with a non-UUID subject (pre-UUID tokens): treat as anonymous
+      }
 
-      userRepository.findById(userId).ifPresent(user -> {
+      if (userId != null) userCache.find(userId).ifPresent(user -> {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, List.of());
         auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

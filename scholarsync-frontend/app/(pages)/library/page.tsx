@@ -1,5 +1,10 @@
-export default function GroupsPage() {
+import { Suspense } from "react";
+import { LibraryView } from "./LibraryView";
+
+export default function LibraryPage() {
     return (
-        <h1>Library</h1>
+        <Suspense>
+            <LibraryView />
+        </Suspense>
     );
-};
+}

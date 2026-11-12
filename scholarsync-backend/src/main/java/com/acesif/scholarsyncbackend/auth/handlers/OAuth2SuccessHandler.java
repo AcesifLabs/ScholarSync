@@ -1,27 +1,29 @@
 package com.acesif.scholarsyncbackend.auth.handlers;
 
-import com.acesif.scholarsyncbackend.auth.dtos.CustomOAuth2User;
-import com.acesif.scholarsyncbackend.auth.dtos.CustomOidcUser;
+import com.acesif.scholarsyncbackend.auth.principals.CustomOAuth2User;
+import com.acesif.scholarsyncbackend.auth.principals.CustomOidcUser;
 import com.acesif.scholarsyncbackend.auth.services.JwtService;
-import com.acesif.scholarsyncbackend.commons.config.properties.JsonWebToken;
+import com.acesif.scholarsyncbackend.commons.config.properties.JwtProperties;
+import com.acesif.scholarsyncbackend.commons.utils.AuthCookies;
 import jakarta.servlet.http.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-  private final JwtService jwtUtils;
-  private final JsonWebToken jwtConfig;
+  private final JwtService jwtService;
+  private final JwtProperties jwtConfig;
+  private final AuthCookies authCookies;
 
   @Override
   public void onAuthenticationSuccess(
@@ -31,7 +33,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   ) throws IOException {
 
     Object principal = Objects.requireNonNull(authentication.getPrincipal());
-    String userId;
+    UUID userId;
 
     if (principal instanceof CustomOAuth2User oAuth2User) {
       userId = oAuth2User.internalUserId();
@@ -41,18 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       throw new ClassCastException("Unknown principal type: " + principal.getClass().getName());
     }
 
-    String token = jwtUtils.generateToken(userId);
-
-    ResponseCookie cookie = ResponseCookie.from("auth_token", token)
-            .httpOnly(true)
-            .secure(false)
-            .path("/")
-            .maxAge(Integer.parseInt(jwtConfig.getExpirationMs()) / 1000)
-            .sameSite("Lax")
-            .build();
-
-    response.addHeader("Set-Cookie", cookie.toString());
-
-    getRedirectStrategy().sendRedirect(request, response, jwtConfig.getFrontendUrl() + "/auth/callback");
+    response.addHeader(HttpHeaders.SET_COOKIE, authCookies.issue(jwtService.generateToken(userId)).toString());
+    getRedirectStrategy().sendRedirect(request, response, jwtConfig.getFrontendUrl() + jwtConfig.getCallbackPath());
   }
 }
